@@ -1,0 +1,15 @@
+"output": {
+  "agentInteractiveUI": "false",
+  "azureId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-vmss-azdo-agents-01/providers/Microsoft.Compute/virtualMachineScaleSets/azdo-vmss-pool-001",
+  "desiredIdle": "0",
+  "desiredSize": "0",
+  "maxCapacity": "2",
+  "maxSavedNodeCount": "0",
+  "osType": "linux",
+  "poolId": "47",
+  "recycleAfterEachUse": "false",
+  "serviceEndpointId": "9e472165-b56d-4b28-a1ff-6d6c415d6ad3",
+  "serviceEndpointScope": "290659e0-6f38-49da-8f20-a29070687d7c",
+  "sizingAttempts": "0",
+  "timeToLiveMinutes": "30"
+}

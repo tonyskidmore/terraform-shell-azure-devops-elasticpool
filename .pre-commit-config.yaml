@@ -1,0 +1,61 @@
+---
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.3.0
+    hooks:
+      - id: check-json
+        exclude: devcontainer.json
+      - id: check-yaml
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: detect-private-key
+
+  - repo: https://github.com/bridgecrewio/checkov.git
+    rev: '2.1.201'
+    hooks:
+    - id: checkov
+      verbose: false
+      args: []
+
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.74.1 # Get the latest from: https://github.com/antonbabenko/pre-commit-terraform/releases
+    hooks:
+      - id: terraform_fmt
+      - id: terraform_validate
+      # - id: terraform_checkov
+
+  - repo: https://github.com/terraform-docs/terraform-docs
+    rev: "v0.16.0"
+    hooks:
+      - id: terraform-docs-go
+        args: ["markdown", "table", "--output-file", "README.md", "./"]
+
+  -   repo: https://github.com/koalaman/shellcheck-precommit
+      rev: v0.8.0
+      hooks:
+      -   id: shellcheck
+
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [python]
+        args:
+          [
+            # "-rn", # Only display messages
+            # "-sn", # Don't display the score
+          ]
+
+  -   repo: https://github.com/PyCQA/flake8
+      rev: 4.0.1
+      hooks:
+      - id: flake8
+
+  -   repo: https://github.com/PyCQA/isort
+      rev: 5.10.1
+      hooks:
+      -   id: isort
