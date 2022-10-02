@@ -1,36 +1,37 @@
 // https://containers.dev/implementors/json_reference/
+// https://containers.dev/implementors/features/
 {
-    "build": {
-        "dockerfile": "./Dockerfile",
-        "context": "."
-    },
-    "features": {
-        "ghcr.io/devcontainers/features/common-utils:1":{
-            "installZsh": "true",
-            "username": "vscode",
-            "uid": "1000",
-            "gid": "1000",
-            "upgradePackages": "true"
-        },
-        "ghcr.io/devcontainers/features/terraform:1": {
-					"version": "latest",
-					"tflint": "latest"
-				},
-        "ghcr.io/devcontainers/features/python:1": "none",
-        "ghcr.io/devcontainers/features/node:1": "none",
-        "ghcr.io/devcontainers/features/go:1": {
-					"version": "latest"
-				},
-				"ghcr.io/devcontainers/features/docker-in-docker:1": {
-					"version": "latest"
-			  },
-				"ghcr.io/devcontainers/features/docker-from-docker:1": {
-					"version": "latest"
-			  }
-    },
-    "overrideFeatureInstallOrder": [
-        "ghcr.io/devcontainers/features/common-utils"
-    ],
+	"build": {
+			"dockerfile": "./Dockerfile",
+			"context": "."
+	},
+	"features": {
+			"ghcr.io/devcontainers/features/common-utils:1":{
+					"installZsh": "true",
+					"username": "vscode",
+					"uid": "1000",
+					"gid": "1000",
+					"upgradePackages": "true"
+			},
+			"ghcr.io/devcontainers/features/terraform:1": {
+				"version": "latest",
+				"tflint": "latest"
+			},
+			"ghcr.io/devcontainers/features/python:1": "none",
+			"ghcr.io/devcontainers/features/node:1": "none",
+			"ghcr.io/devcontainers/features/go:1": {
+				"version": "latest"
+			},
+			"ghcr.io/devcontainers/features/docker-in-docker:1": {
+				"version": "latest"
+			},
+			"ghcr.io/devcontainers/features/docker-from-docker:1": {
+				"version": "latest"
+			}
+	},
+	"overrideFeatureInstallOrder": [
+			"ghcr.io/devcontainers/features/common-utils"
+	],
 	// Configure tool-specific properties.
 	"customizations": {
 		// Configure properties specific to VS Code.
@@ -69,7 +70,8 @@
 	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode",
 	"mounts": [
-		"source=${env:HOME}${env:USERPROFILE}/.pre-commit,target=/home/vscode/.pre-commit,type=bind,consistency=cached"
+		"source=${localEnv:HOME}${localEnv:USERPROFILE}/.pre-commit,target=/home/vscode/.pre-commit,type=bind,consistency=cached",
+		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
 	],
 	"remoteEnv": {
 		"PRE_COMMIT_HOME": "/home/vscode/.pre-commit"
