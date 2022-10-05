@@ -128,7 +128,7 @@ poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools/${poolId}?api-version=7.1
 curlwithcode "GET" "$poolUrl"
 checkout
 
-printf "poolId: %\n" "$poolId"
+printf "poolId: %s\n" "$poolId"
 printf "poolUrl: %s\n" "$poolUrl"
 
 # this will be what gets saved to state
