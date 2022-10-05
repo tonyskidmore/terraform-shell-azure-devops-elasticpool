@@ -29,9 +29,7 @@ echo "project_id: $project_id"
 }
 END
 
-# https://docs.microsoft.com/en-us/rest/api/azure/devops/distributedtask/elasticpools/update?view=azure-devops-rest-7.1
-# PATCH https://dev.azure.com/{organization}/_apis/distributedtask/elasticpools/{poolId}?api-version=7.1-preview.1
-
+# https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/elasticpools/update?view=azure-devops-rest-7.1
 poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools/$pool_id?api-version=7.1-preview.1"
 
 # do PATCH
