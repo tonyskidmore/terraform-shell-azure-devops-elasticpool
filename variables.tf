@@ -9,10 +9,6 @@ variable "ado_org" {
   description = "Azure DevOps Organization name"
 }
 
-variable "ado_project" {
-  type        = string
-  description = "Azure DevOps project name"
-}
 
 variable "ado_service_connection" {
   type        = string
@@ -25,7 +21,24 @@ variable "ado_vmss_id" {
   default     = ""
 }
 
+variable "ado_project" {
+  type        = string
+  description = "Azure DevOps project name where service connection exists and optionally where pool will only be created"
+}
+
 # variables with predefined defaults
+
+
+variable "ado_project_only" {
+  type        = string
+  description = "Only create the agent pool in the Azure DevOps pool specified?"
+  default     = "False"
+
+  validation {
+    condition     = contains(["True", "False"], var.ado_project_only)
+    error_message = "ado_project_only must be True or False."
+  }
+}
 
 variable "ado_pool_desired_idle" {
   type        = number
@@ -79,10 +92,20 @@ variable "ado_pool_auth_all_pipelines" {
   type        = string
   description = "Setting to determine if all pipelines are authorized to use this TaskAgentPool by default"
   default     = "True"
+
+  validation {
+    condition     = contains(["True", "False"], var.ado_pool_auth_all_pipelines)
+    error_message = "ado_pool_auth_all_pipelines must be True or False."
+  }
 }
 
 variable "ado_pool_auto_provision_projects" {
   type        = string
   description = "Setting to automatically provision TaskAgentQueues in every project for the new pool"
   default     = "False"
+
+  validation {
+    condition     = contains(["True", "False"], var.ado_pool_auto_provision_projects)
+    error_message = "ado_pool_auto_provision_projects must be True or False."
+  }
 }

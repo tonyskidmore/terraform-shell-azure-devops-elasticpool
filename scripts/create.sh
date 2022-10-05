@@ -66,6 +66,7 @@ checkout() {
 
 # end functions
 
+
 printf "ADO_ORG: %s\n" "$ADO_ORG"
 # GET https://dev.azure.com/fabrikam/_apis/projects?api-version=6.0
 projectUrl="$ADO_ORG/_apis/projects?api-version=6.0"
@@ -73,13 +74,12 @@ projectUrl="$ADO_ORG/_apis/projects?api-version=6.0"
 curlwithcode "GET" "$projectUrl"
 checkout
 
-
 project=$(printf "%s" "$out" | jq -r --arg name "$ADO_PROJECT" '.value[] | select (.name==$name)')
 project_id=$(echo "$project" | jq -r '.id')
 
 printf "ADO_PROJECT: %s\n" "$ADO_PROJECT"
 printf "ADO_SERVICE_CONNECTION: %s\n" "$ADO_SERVICE_CONNECTION"
-# GET https://dev.azure.com/{organization}/{project}/_apis/serviceendpoint/endpoints?endpointNames=MyNewServiceEndpoint&api-version=6.0-preview.4
+# https://learn.microsoft.com/en-us/rest/api/azure/devops/serviceendpoint/endpoints/get-service-endpoints-by-names?view=azure-devops-rest-6.0&tabs=HTTP
 endpointUrl="$ADO_ORG/$ADO_PROJECT/_apis/serviceendpoint/endpoints?endpointNames=$ADO_SERVICE_CONNECTION&api-version=6.0-preview.4"
 
 curlwithcode "GET" "$endpointUrl"
@@ -112,7 +112,13 @@ printf "ADO_POOL_AUTH_ALL_PIPELINES: %s\n" "$ADO_POOL_AUTH_ALL_PIPELINES"
 printf "ADO_POOL_AUTO_PROVISION: %s\n" "$ADO_POOL_AUTO_PROVISION"
 printf "project_id: %s\n" "$project_id"
 # https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/elasticpools/create?view=azure-devops-rest-7.1
-poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools?poolName=${ADO_POOL_NAME}&authorizeAllPipelines=${ADO_POOL_AUTH_ALL_PIPELINES}&autoProvisionProjectPools=${ADO_POOL_AUTO_PROVISION}&projectId=${project_id}&api-version=7.1-preview.1"
+if [ "$ADO_PROJECT_ONLY" = "True" ]
+then
+  poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools?poolName=${ADO_POOL_NAME}&authorizeAllPipelines=${ADO_POOL_AUTH_ALL_PIPELINES}&autoProvisionProjectPools=${ADO_POOL_AUTO_PROVISION}&projectId=${project_id}&api-version=7.1-preview.1"
+else
+  poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools?poolName=${ADO_POOL_NAME}&authorizeAllPipelines=${ADO_POOL_AUTH_ALL_PIPELINES}&autoProvisionProjectPools=${ADO_POOL_AUTO_PROVISION}&api-version=7.1-preview.1"
+fi
+printf "poolUrl: %s\n" "$poolUrl"
 
 curlwithcode "POST" "$poolUrl"
 checkout

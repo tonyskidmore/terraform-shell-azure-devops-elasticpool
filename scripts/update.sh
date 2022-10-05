@@ -1,8 +1,5 @@
-#!/bin/bash
+#!/bin/sh
 
-# set -ex
-# https://www.howtogeek.com/782514/how-to-use-set-and-pipefail-in-bash-scripts-on-linux/
-# set -eou pipefail
 set -eu
 
 IN=$(cat)

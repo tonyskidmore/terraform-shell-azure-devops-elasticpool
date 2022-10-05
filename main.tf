@@ -14,6 +14,7 @@ resource "shell_script" "ado_vmss_pool" {
     AZ_VMSS_ID                    = var.ado_vmss_id
     ADO_ORG                       = var.ado_org
     ADO_PROJECT                   = var.ado_project
+    ADO_PROJECT_ONLY              = var.ado_project_only
     ADO_SERVICE_CONNECTION        = var.ado_service_connection
     ADO_POOL_NAME                 = var.ado_pool_name
     ADO_POOL_DESIRED_IDLE         = var.ado_pool_desired_idle
