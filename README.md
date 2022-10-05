@@ -53,6 +53,17 @@ No modules.
 | <a name="output_ado_vmss_pool_output"></a> [ado\_vmss\_pool\_output](#output\_ado\_vmss\_pool\_output) | Azure DevOps VMSS Agent Pool output |
 <!-- END_TF_DOCS -->
 
+## Debuging
+
+````bash
+
+export TF_LOG=TRACE
+export TF_LOG_PATH="./trace.log"
+
+````
+
+`[DEBUG] Starting execution...`
+
 ## Development
 
 [Developing inside a Container](https://code.visualstudio.com/docs/remote/containers)

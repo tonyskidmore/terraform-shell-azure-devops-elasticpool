@@ -10,6 +10,7 @@ terraform {
 }
 
 provider "shell" {
+  # interpreter = ["/bin/bash"]
   sensitive_environment = {
     AZURE_DEVOPS_EXT_PAT = var.ado_ext_pat
   }

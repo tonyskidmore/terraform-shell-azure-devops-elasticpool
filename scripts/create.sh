@@ -1,61 +1,91 @@
-#!/bin/bash
+#!/bin/sh
+set -eu
 
-# set -ex
-# https://www.howtogeek.com/782514/how-to-use-set-and-pipefail-in-bash-scripts-on-linux/
-# set -eou pipefail
-# set -eu
-# set -u
+# functions
 
 curlwithcode() {
-    status=0
-    # Run curl in a separate command, capturing output of -w "%{http_code}" into statuscode
-    # and sending the content to a file with -o >(cat >/tmp/curl_body)
-    http_code=$(curl \
-                 --silent \
-                 --show-error \
-                 --write-out '%{http_code}' \
-                 --header "Content-Type: application/json" \
-                 --request POST \
-                 --user ":$AZURE_DEVOPS_EXT_PAT" \
-                 --data @params.json \
-                 --output /tmp/curl_body \
-                 "$poolUrl"
-    ) || status="$?"
 
-    out="$(cat /tmp/curl_body)"
-    # out=$(</tmp/curl_body)
+  status=0
+  output="output.out"
+  out=""
+
+  # Run curl in a separate command, capturing output of -w "%{http_code}" into statuscode
+  # and sending the content to a file with -o >(cat >/tmp/curl_body)
+  http_code=$(curl \
+                --silent \
+                --show-error \
+                --write-out '%{http_code}' \
+                --header "Content-Type: application/json" \
+                --request "$1" \
+                --user ":$AZURE_DEVOPS_EXT_PAT" \
+                --data @params.json \
+                --output "$output" \
+                "$2"
+  ) || status="$?"
+
+  out=$(cat "$output")
+  rm -f "$output"
+
 }
 
+
+checkout() {
+
+  # echo "$out" > "out"
+  if [ "$http_code" != "200" ]
+  then
+    if [ "$(echo "$out" | jq empty > /dev/null 2>&1; echo $?)" = "0" ]
+    then
+      echo "Parsed JSON successfully and got something other than false/null"
+      message="$(echo "$out" | jq -r '.message')"
+      printf "Error: %s\n" "$message" >&2
+      exit 1
+    else
+      printf "Failed to parse JSON, or got false/null.\n" >&2
+      if echo "$out" | grep -q "_signin"
+      then
+        printf "Azure DevOps PAT token is not correct\n" >&2
+        exit 1
+      elif echo "$out" | grep -q "The resource cannot be found."
+      then
+        printf "The resource cannot be found.\n" >&2
+        exit 1
+      else
+        printf "%s\n" "$out"
+        exit 1
+      fi
+    fi
+  elif [ "$status" != "0" ]
+  then
+    printf "status: %s\n" "$status"
+    printf "%s\n" "$out"
+    exit 1
+  fi
+
+}
+
+# end functions
+
+printf "ADO_ORG: %s\n" "$ADO_ORG"
 # GET https://dev.azure.com/fabrikam/_apis/projects?api-version=6.0
 projectUrl="$ADO_ORG/_apis/projects?api-version=6.0"
 
-resp=$(curl \
-  --silent \
-  --show-error \
-  --header "Content-Type: application/json" \
-  --request GET \
-  --user ":$AZURE_DEVOPS_EXT_PAT" \
-  "$projectUrl")
+curlwithcode "GET" "$projectUrl"
+checkout
 
-printf "project resp: %s\n"  "$resp"
 
-project=$(printf "%s" "$resp" | jq -r --arg name "$ADO_PROJECT" '.value[] | select (.name==$name)')
+project=$(printf "%s" "$out" | jq -r --arg name "$ADO_PROJECT" '.value[] | select (.name==$name)')
 project_id=$(echo "$project" | jq -r '.id')
 
-
+printf "ADO_PROJECT: %s\n" "$ADO_PROJECT"
+printf "ADO_SERVICE_CONNECTION: %s\n" "$ADO_SERVICE_CONNECTION"
 # GET https://dev.azure.com/{organization}/{project}/_apis/serviceendpoint/endpoints?endpointNames=MyNewServiceEndpoint&api-version=6.0-preview.4
 endpointUrl="$ADO_ORG/$ADO_PROJECT/_apis/serviceendpoint/endpoints?endpointNames=$ADO_SERVICE_CONNECTION&api-version=6.0-preview.4"
-resp=$(curl \
-  --silent \
-  --show-error \
-  --header "Content-Type: application/json" \
-  --request GET \
-  --user ":$AZURE_DEVOPS_EXT_PAT" \
-  "$endpointUrl")
 
-printf "endpoint resp: %s\n"  "$resp"
+curlwithcode "GET" "$endpointUrl"
+checkout
 
-endpoint_id=$(echo "$resp" | jq -r '.value[].id')
+endpoint_id=$(echo "$out" | jq -r '.value[].id')
 
 # make payload for the POST request
 /bin/cat <<END >params.json
@@ -76,91 +106,30 @@ endpoint_id=$(echo "$resp" | jq -r '.value[].id')
   "timeToLiveMinutes": $ADO_POOL_TTL_MINS
 }
 END
+
+printf "ADO_POOL_NAME: %s\n" "$ADO_POOL_NAME"
+printf "ADO_POOL_AUTH_ALL_PIPELINES: %s\n" "$ADO_POOL_AUTH_ALL_PIPELINES"
+printf "ADO_POOL_AUTO_PROVISION: %s\n" "$ADO_POOL_AUTO_PROVISION"
+printf "project_id: %s\n" "$project_id"
 # https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/elasticpools/create?view=azure-devops-rest-7.1
 poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools?poolName=${ADO_POOL_NAME}&authorizeAllPipelines=${ADO_POOL_AUTH_ALL_PIPELINES}&autoProvisionProjectPools=${ADO_POOL_AUTO_PROVISION}&projectId=${project_id}&api-version=7.1-preview.1"
 
-# do POST
-resp=$(curl \
-  --silent \
-  --show-error \
-  --header "Content-Type: application/json" \
-  --request POST \
-  --user ":$AZURE_DEVOPS_EXT_PAT" \
-  --data @params.json \
-  "$poolUrl")
-
-printf "pool create resp: %s\n"  "$resp"
+curlwithcode "POST" "$poolUrl"
+checkout
 
 # cleanup
-# rm params.json
+rm params.json
 
 # GET https://dev.azure.com/{organization}/_apis/distributedtask/elasticpools/{poolId}?api-version=7.1-preview.1
-# do GET - this will be what gets saved to state
-poolId=$(echo "$resp" | jq -r .elasticPool.poolId)
+
+poolId=$(echo "$out" | jq -r .elasticPool.poolId)
 poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools/${poolId}?api-version=7.1-preview.1"
 
-# Curl to return http status code along with the response
-# https://stackoverflow.com/questions/38906626/curl-to-return-http-status-code-along-with-the-response#:~:text=Curl%20allows%20you%20to%20customize%20output.%20You%20can,the%20response%20is%20worth%20printing%2C%20processing%2C%20logging%2C%20etc.
-echo "$poolId"
-# resp=$(curl \
-#   --silent \
-#   --show-error \
-#   --header "Content-Type: application/json" \
-#   --request GET \
-#   --user ":$AZURE_DEVOPS_EXT_PAT" \
-#   "$poolUrl")
+curlwithcode "GET" "$poolUrl"
+checkout
 
-# printf "pool get resp: %s\n"  "$resp"
+printf "poolId: %\n" "$poolId"
+printf "poolUrl: %s\n" "$poolUrl"
 
-# {
-#   IFS= read -rd '' out
-#   IFS= read -rd '' http_code
-#   IFS= read -rd '' status
-# } < <({ out=$(curl \
-#               --silent \
-#               --show-error \
-#               --output /dev/stderr \
-#               -w "%{http_code}" \
-#               --header "Content-Type: application/json" \
-#               --request POST \
-#               --user ":$AZURE_DEVOPS_EXT_PAT" \
-#               --data @params.json $poolUrl)
-#       } 2>&1; printf '\0%s' "$out" "$?")
-
-curlwithcode
-
-printf "out: %s\n" "$out"
-printf "http_code: %s\n" "$http_code"
-printf "status: %s\n" "$status"
-
-# if jq -e . <<<"$out"; then
-if [ "$(echo "$out" | jq empty > /dev/null 2>&1; echo $?)" == "0" ]
-then
-  echo "Parsed JSON successfully and got something other than false/null"
-  declare -A env_vars
-
-  # loop through key/value using to_entries to add entries to associative array
-  json=$(echo "$out" | jq -r '. | to_entries | .[] | .key + "=" + (.value|tostring)')
-  while IFS=":" read -r key value; do
-    env_vars["$key"]="$value"
-  # done < <(jq -r '. | to_entries | .[] | .key + "=" + .value' <<< "${out}")
-  # done < <(echo "$out" | jq -r '. | to_entries | .[] | .key + "=" + (.value|tostring)')
-  done < "$json"
-  declare -p env_vars
-
-  for key in "${!env_vars[@]}"; do
-    key="${key//\$/}"
-    echo "$key ${env_vars[$key]}"
-    export "$key"="${env_vars[$key]}"
-  done
-else
-  printf "{%s} Failed to parse JSON, or got false/null.\n" "$(date)" >&2
-  exit 1
-fi
-
-# message is assigned parsing error output above
-# shellcheck disable=SC2154
-printf "message: %s\n" "$message"
-
-# remove_fields "$resp"
-printf "%s" "$resp" | jq -r 'del(.offlineSince, .state)'
+# this will be what gets saved to state
+printf "%s" "$out" | jq -r 'del(.offlineSince, .state)'
