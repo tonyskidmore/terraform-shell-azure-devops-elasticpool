@@ -126,7 +126,7 @@ checkout
 # cleanup
 rm params.json
 
-# GET https://dev.azure.com/{organization}/_apis/distributedtask/elasticpools/{poolId}?api-version=7.1-preview.1
+# https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/elasticpools/get?view=azure-devops-rest-7.1
 
 poolId=$(echo "$out" | jq -r .elasticPool.poolId)
 poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools/${poolId}?api-version=7.1-preview.1"

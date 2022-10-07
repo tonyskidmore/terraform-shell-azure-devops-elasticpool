@@ -31,7 +31,7 @@ variable "ado_project" {
 
 variable "ado_project_only" {
   type        = string
-  description = "Only create the agent pool in the Azure DevOps pool specified?"
+  description = "Only create the agent pool in the Azure DevOps pool specified? (at create only)"
   default     = "False"
 
   validation {
@@ -90,7 +90,7 @@ variable "ado_pool_ttl_mins" {
 
 variable "ado_pool_auth_all_pipelines" {
   type        = string
-  description = "Setting to determine if all pipelines are authorized to use this TaskAgentPool by default"
+  description = "Setting to determine if all pipelines are authorized to use this TaskAgentPool by default (at create only)"
   default     = "True"
 
   validation {
@@ -101,8 +101,8 @@ variable "ado_pool_auth_all_pipelines" {
 
 variable "ado_pool_auto_provision_projects" {
   type        = string
-  description = "Setting to automatically provision TaskAgentQueues in every project for the new pool"
-  default     = "False"
+  description = "Setting to automatically provision TaskAgentQueues in every project for the new pool (at create only)"
+  default     = "True"
 
   validation {
     condition     = contains(["True", "False"], var.ado_pool_auto_provision_projects)
