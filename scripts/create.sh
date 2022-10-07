@@ -31,7 +31,6 @@ curlwithcode() {
 
 checkout() {
 
-  # echo "$out" > "out"
   if [ "$http_code" != "200" ]
   then
     if [ "$(echo "$out" | jq empty > /dev/null 2>&1; echo $?)" = "0" ]
@@ -57,7 +56,7 @@ checkout() {
     fi
   elif [ "$status" != "0" ]
   then
-    printf "status: %s\n" "$status"
+    printf "status: %s\n" "$status" >&2
     printf "%s\n" "$out"
     exit 1
   fi
