@@ -81,10 +81,21 @@ create () {
   printf "%s" "$out" | jq -r 'del(.offlineSince, .state)'
 }
 
-read() {
-
+input_state() {
   std_in=$(cat)
   printf "std_in: %s\n" "$std_in"
+}
+
+output_state() {
+  printf "%s" "$out" | jq -r 'del(.offlineSince, .state)'
+}
+
+read() {
+
+  # std_in=$(cat)
+  # printf "std_in: %s\n" "$std_in"
+  input_state
+
   poolId=$(echo "$std_in" | jq -r '.poolId')
   printf "poolId: %s\n" "$poolId"
 
@@ -92,19 +103,21 @@ read() {
   poolUrl="$ADO_ORG/_apis/distributedtask/elasticpools/${poolId}?api-version=7.1-preview.1"
 
   curlwithcode "GET" "$poolUrl"
-  checkout
 
-  printf "%s" "$out" | jq -r 'del(.offlineSince, .state)'
+  # printf "%s" "$out" | jq -r 'del(.offlineSince, .state)'
+  output_state
 
 }
 
 update() {
-  IN=$(cat)
-  echo "UPDATE_IN: $IN"
-  AZ_VMSS_ID=$(echo "$IN" | jq -r '.azureId')
-  endpoint_id=$(echo "$IN" | jq -r '.serviceEndpointId')
-  project_id=$(echo "$IN" | jq -r '.serviceEndpointScope')
-  pool_id=$(echo "$IN" | jq -r '.poolId')
+  # IN=$(cat)
+  # echo "UPDATE_IN: $IN"
+  input_state
+
+  AZ_VMSS_ID=$(echo "$std_in" | jq -r '.azureId')
+  endpoint_id=$(echo "$std_in" | jq -r '.serviceEndpointId')
+  project_id=$(echo "$std_in" | jq -r '.serviceEndpointScope')
+  pool_id=$(echo "$std_in" | jq -r '.poolId')
   echo "pool_id: $pool_id"
   echo "AZ_VMSS_ID: $AZ_VMSS_ID"
   echo "endpoint_id: $endpoint_id"
@@ -126,74 +139,89 @@ update() {
 # }
 # END
 
-  update_post_data
+  # update_post_data
 
   # https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/elasticpools/update?view=azure-devops-rest-7.1
   poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools/$pool_id?api-version=7.1-preview.1"
 
   # do PATCH
-  resp=$(curl \
-    --silent \
-    --show-error \
-    --header "Content-Type: application/json" \
-    --request PATCH \
-    --user ":$AZURE_DEVOPS_EXT_PAT" \
-    --data @params.json \
-    "$poolUrl")
+  # resp=$(curl \
+  #   --silent \
+  #   --show-error \
+  #   --header "Content-Type: application/json" \
+  #   --request PATCH \
+  #   --user ":$AZURE_DEVOPS_EXT_PAT" \
+  #   --data @params.json \
+  #   "$poolUrl")
 
   # cleanup
   # rm params.json
+
+  curlwithcode "PATCH" "$poolUrl"
 
   # do GET - this will be what gets saved to state
   poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools/$pool_id?api-version=7.1-preview.1"
 
   echo "$pool_id"
-  resp=$(curl \
-    --silent \
-    --show-error \
-    --header "Content-Type: application/json" \
-    --request GET \
-    --user ":$AZURE_DEVOPS_EXT_PAT" \
-    "$poolUrl")
+  # resp=$(curl \
+  #   --silent \
+  #   --show-error \
+  #   --header "Content-Type: application/json" \
+  #   --request GET \
+  #   --user ":$AZURE_DEVOPS_EXT_PAT" \
+  #   "$poolUrl")
 
-  printf "%s" "$resp" | jq -r 'del(.offlineSince, .state)'
+  curlwithcode "GET" "$poolUrl"
+
+  # printf "%s" "$resp" | jq -r 'del(.offlineSince, .state)'
+  # printf "%s" "$out" | jq -r 'del(.offlineSince, .state)'
+  output_state
 }
 
 delete() {
 
   # GET https://dev.azure.com/{organization}/_apis/distributedtask/pools?api-version=6.0
-  poolUrl="$ADO_ORG/_apis/distributedtask/pools?api-version=6.0"
+  # poolUrl="$ADO_ORG/_apis/distributedtask/pools?api-version=6.0"
 
-  resp=$(curl \
-    --silent \
-    --show-error \
-    --header "Content-Type: application/json" \
-    --request GET \
-    --user ":$AZURE_DEVOPS_EXT_PAT" \
-    "$poolUrl")
+  # resp=$(curl \
+  #   --silent \
+  #   --show-error \
+  #   --header "Content-Type: application/json" \
+  #   --request GET \
+  #   --user ":$AZURE_DEVOPS_EXT_PAT" \
+  #   "$poolUrl")
 
-  pool=$(printf "%s" "$resp" | jq -r --arg name "$ADO_POOL_NAME" '.value[] | select (.name==$name)')
-  echo "$pool"
+  # pool=$(printf "%s" "$resp" | jq -r --arg name "$ADO_POOL_NAME" '.value[] | select (.name==$name)')
+  # echo "$pool"
 
-  pool_id=$(echo "$pool" | jq -r '.id')
-  echo "pool_id: $pool_id"
+  # pool_id=$(echo "$pool" | jq -r '.id')
+  # echo "pool_id: $pool_id"
 
-  if [ -z "$pool_id" ]
-  then
-    echo "failed to get pool_id to delete"
-    exit 1
-  fi
+  # if [ -z "$pool_id" ]
+  # then
+  #   echo "failed to get pool_id to delete"
+  #   exit 1
+  # fi
+
+  input_state
+
+  # AZ_VMSS_ID=$(echo "$std_in" | jq -r '.azureId')
+  # endpoint_id=$(echo "$std_in" | jq -r '.serviceEndpointId')
+  # project_id=$(echo "$std_in" | jq -r '.serviceEndpointScope')
+  pool_id=$(echo "$std_in" | jq -r '.poolId')
 
   # DELETE https://dev.azure.com/{organization}/_apis/distributedtask/pools/{poolId}?api-version=7.1-preview.1
   poolUrl="$ADO_ORG/_apis/distributedtask/pools/$pool_id?api-version=7.1-preview.1"
 
-  resp=$(curl \
-    --silent \
-    --show-error \
-    --header "Content-Type: application/json" \
-    --request DELETE \
-    --user ":$AZURE_DEVOPS_EXT_PAT" \
-    "$poolUrl")
+  # resp=$(curl \
+  #   --silent \
+  #   --show-error \
+  #   --header "Content-Type: application/json" \
+  #   --request DELETE \
+  #   --user ":$AZURE_DEVOPS_EXT_PAT" \
+  #   "$poolUrl")
+
+  curlwithcode "DELETE" "$poolUrl"
 
 }
 
@@ -250,16 +278,19 @@ curlwithcode() {
   printf "method: %s\n" "$method"
 
   params=(
-              "--silent" \
-              "--show-error" \
-              "--write-out" "\n%{http_code}" \
-              "--header" "Content-Type: application/json" \
-              "--request" "$1"
+          "--silent" \
+          "--show-error" \
+          "--write-out" "\n%{http_code}" \
+          "--header" "Content-Type: application/json" \
+          "--request" "$1"
   )
 
-  if [[ "$method" == "POST" ]]
+  if [[ "$method" == "POST" || "$method" == "PATCH" ]]
   then
-    data="$(create_post_data)"
+    # mode is global varaiable defined in parent script
+    # shellcheck disable=SC2154
+    data_func="${mode}_post_data"
+    data="$($data_func)"
     printf "data: %s\n" "$data"
     params+=("--data" "$data")
   fi
@@ -298,15 +329,16 @@ curlwithcode() {
 
   # out=$(cat "$output")
   # rm -f "$output"
+  checkout
 
 }
 
 
 checkout() {
 
-  if [ "$http_code" != "200" ]
+  if [[ "$mode" != "delete" && "$http_code" != "200" ]]
   then
-    if [ "$(echo "$out" | jq empty > /dev/null 2>&1; echo $?)" = "0" ]
+    if [[ "$(echo "$out" | jq empty > /dev/null 2>&1; echo $?)" = "0" ]]
     then
       echo "Parsed JSON successfully and got something other than false/null"
       message="$(echo "$out" | jq -r '.message')"
@@ -327,11 +359,20 @@ checkout() {
         exit 1
       fi
     fi
-  elif [ "$status" != "0" ]
+  elif [[ "$mode" == "delete" && "$http_code" != "204" ]]
+  then
+    printf "Destroy operation did not return expected 204, returned: %s.\n" "$http_code" >&2
+    exit 1
+  elif [[ "$status" != "0" ]]
   then
     printf "status: %s\n" "$status"  >&2
     printf "%s\n" "$out"
     exit 1
+  else
+    printf "Unknown failure. Status: %s, HTTP code: %s\n" "$status" "$http_code" >&2
+    exit 1
   fi
+
+  printf "Operation successful. Mode: %s, Status: %s, HTTP code: %s\n" "$mode" "$status" "$http_code"
 
 }
