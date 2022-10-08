@@ -9,7 +9,7 @@ create () {
   # https://learn.microsoft.com/en-us/rest/api/azure/devops/core/projects/get?view=azure-devops-rest-6.0
   projectUrl="$ADO_ORG/_apis/projects?api-version=6.0"
 
-  curlwithcode "GET" "$projectUrl"
+  rest_api_call "GET" "$projectUrl"
   checkout
 
   project=$(printf "%s" "$out" | jq -r --arg name "$ADO_PROJECT" '.value[] | select (.name==$name)')
@@ -22,7 +22,7 @@ create () {
   # https://learn.microsoft.com/en-us/rest/api/azure/devops/serviceendpoint/endpoints/get-service-endpoints-by-names?view=azure-devops-rest-6.0&tabs=HTTP
   endpointUrl="$ADO_ORG/$ADO_PROJECT/_apis/serviceendpoint/endpoints?endpointNames=$ADO_SERVICE_CONNECTION&api-version=6.0-preview.4"
 
-  curlwithcode "GET" "$endpointUrl"
+  rest_api_call "GET" "$endpointUrl"
   checkout
 
   endpoint_id=$(echo "$out" | jq -r '.value[].id')
@@ -44,7 +44,7 @@ create () {
   printf "poolUrl: %s\n" "$poolUrl"
 
   # Create the elasticpool
-  curlwithcode "POST" "$poolUrl"
+  rest_api_call "POST" "$poolUrl"
   checkout
 
   # query the new pool using the poolId returned by the create REST API call
@@ -52,7 +52,7 @@ create () {
   poolId=$(echo "$out" | jq -r .elasticPool.poolId)
   poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools/${poolId}?api-version=7.1-preview.1"
 
-  curlwithcode "GET" "$poolUrl"
+  rest_api_call "GET" "$poolUrl"
   checkout
 
   printf "poolId: %s\n" "$poolId"
@@ -75,7 +75,7 @@ read() {
   # https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/elasticpools/get?view=azure-devops-rest-7.1
   poolUrl="$ADO_ORG/_apis/distributedtask/elasticpools/${poolId}?api-version=7.1-preview.1"
 
-  curlwithcode "GET" "$poolUrl"
+  rest_api_call "GET" "$poolUrl"
 
   output_state
 
@@ -93,12 +93,12 @@ update() {
   # https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/elasticpools/update?view=azure-devops-rest-7.1
   poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools/$pool_id?api-version=7.1-preview.1"
 
-  curlwithcode "PATCH" "$poolUrl"
+  rest_api_call "PATCH" "$poolUrl"
 
   # do GET - this will be what gets saved to state
   poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools/$pool_id?api-version=7.1-preview.1"
 
-  curlwithcode "GET" "$poolUrl"
+  rest_api_call "GET" "$poolUrl"
   output_state
 
 }
@@ -113,7 +113,7 @@ delete() {
   # https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/agents/delete?view=azure-devops-rest-7.1
   poolUrl="$ADO_ORG/_apis/distributedtask/pools/$pool_id?api-version=7.1-preview.1"
 
-  curlwithcode "DELETE" "$poolUrl"
+  rest_api_call "DELETE" "$poolUrl"
 
 }
 
@@ -172,7 +172,7 @@ EOF
 }
 
 
-curlwithcode() {
+rest_api_call() {
 
   status=0
   local method="$1"
