@@ -2,61 +2,49 @@
 
 create () {
 
+  # Crud - Create operation
 
   printf "ADO_ORG: %s\n" "$ADO_ORG"
 
   # Get ADO projects to allow obtaining required project ID
   # https://learn.microsoft.com/en-us/rest/api/azure/devops/core/projects/get?view=azure-devops-rest-6.0
   projectUrl="$ADO_ORG/_apis/projects?api-version=6.0"
-
   rest_api_call "GET" "$projectUrl"
-  checkout
-
   project=$(printf "%s" "$out" | jq -r --arg name "$ADO_PROJECT" '.value[] | select (.name==$name)')
   project_id=$(echo "$project" | jq -r '.id')
-
-  printf "ADO_PROJECT: %s\n" "$ADO_PROJECT"
-  printf "ADO_SERVICE_CONNECTION: %s\n" "$ADO_SERVICE_CONNECTION"
+  printf "project_id: %s\n" "$project_id"
 
   # Get endpoint ID of the specified service connection in the target project
   # https://learn.microsoft.com/en-us/rest/api/azure/devops/serviceendpoint/endpoints/get-service-endpoints-by-names?view=azure-devops-rest-6.0&tabs=HTTP
   endpointUrl="$ADO_ORG/$ADO_PROJECT/_apis/serviceendpoint/endpoints?endpointNames=$ADO_SERVICE_CONNECTION&api-version=6.0-preview.4"
-
   rest_api_call "GET" "$endpointUrl"
-  checkout
-
   endpoint_id=$(echo "$out" | jq -r '.value[].id')
-
-
-  printf "ADO_POOL_NAME: %s\n" "$ADO_POOL_NAME"
-  printf "ADO_POOL_AUTH_ALL_PIPELINES: %s\n" "$ADO_POOL_AUTH_ALL_PIPELINES"
-  printf "ADO_POOL_AUTO_PROVISION: %s\n" "$ADO_POOL_AUTO_PROVISION"
-  printf "project_id: %s\n" "$project_id"
+  printf "endpoint_id: %s\n" "$endpoint_id"
 
   # Only specify the optional project ID if the pool is only required in the specified project, deteremioned by if ADO_PROJECT_ONLY is True
   # https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/elasticpools/create?view=azure-devops-rest-7.1
+  url_prefix="${ADO_ORG}/_apis/distributedtask/elasticpools?poolName=${ADO_POOL_NAME}&authorizeAllPipelines=${ADO_POOL_AUTH_ALL_PIPELINES}&autoProvisionProjectPools=${ADO_POOL_AUTO_PROVISION}"
+  url_suffix="&api-version=7.1-preview.1"
   if [[ "$ADO_PROJECT_ONLY" == "True" ]]
   then
-    poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools?poolName=${ADO_POOL_NAME}&authorizeAllPipelines=${ADO_POOL_AUTH_ALL_PIPELINES}&autoProvisionProjectPools=${ADO_POOL_AUTO_PROVISION}&projectId=${project_id}&api-version=7.1-preview.1"
-  else
-    poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools?poolName=${ADO_POOL_NAME}&authorizeAllPipelines=${ADO_POOL_AUTH_ALL_PIPELINES}&autoProvisionProjectPools=${ADO_POOL_AUTO_PROVISION}&api-version=7.1-preview.1"
+    # poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools?poolName=${ADO_POOL_NAME}&authorizeAllPipelines=${ADO_POOL_AUTH_ALL_PIPELINES}&autoProvisionProjectPools=${ADO_POOL_AUTO_PROVISION}&projectId=${project_id}&api-version=7.1-preview.1"
+    url_suffix="&projectId=${project_id}${url_suffix}"
+  # else
+  #   poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools?poolName=${ADO_POOL_NAME}&authorizeAllPipelines=${ADO_POOL_AUTH_ALL_PIPELINES}&autoProvisionProjectPools=${ADO_POOL_AUTO_PROVISION}&api-version=7.1-preview.1"
   fi
-  printf "poolUrl: %s\n" "$poolUrl"
+  poolUrl="${url_prefix}${url_suffix}"
 
   # Create the elasticpool
+  printf "poolUrl: %s\n" "$poolUrl"
   rest_api_call "POST" "$poolUrl"
-  checkout
 
   # query the new pool using the poolId returned by the create REST API call
   # https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/elasticpools/get?view=azure-devops-rest-7.1
   poolId=$(echo "$out" | jq -r .elasticPool.poolId)
   poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools/${poolId}?api-version=7.1-preview.1"
-
-  rest_api_call "GET" "$poolUrl"
-  checkout
-
   printf "poolId: %s\n" "$poolId"
   printf "poolUrl: %s\n" "$poolUrl"
+  rest_api_call "GET" "$poolUrl"
 
   # this will be what gets saved to state
   output_state
