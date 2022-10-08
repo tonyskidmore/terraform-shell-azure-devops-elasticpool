@@ -87,6 +87,8 @@ update() {
   # crUd - Update operation
   input_state
   pool_id=$(echo "$std_in" | jq -r '.poolId')
+  endpoint_id=$(echo "$std_in" | jq -r '.serviceEndpointId')
+  project_id=$(echo "$std_in" | jq -r '.serviceEndpointScope')
 
   # https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/elasticpools/update?view=azure-devops-rest-7.1
   poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools/$pool_id?api-version=7.1-preview.1"
