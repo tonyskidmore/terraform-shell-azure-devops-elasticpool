@@ -368,9 +368,9 @@ checkout() {
     printf "status: %s\n" "$status"  >&2
     printf "%s\n" "$out"
     exit 1
-  else
-    printf "Unknown failure. Status: %s, HTTP code: %s\n" "$status" "$http_code" >&2
-    exit 1
+  # else
+  #   printf "Unknown failure. Mode: %s, Status: %s, HTTP code: %s\n" "$mode" "$status" "$http_code" >&2
+  #   exit 1
   fi
 
   printf "Operation successful. Mode: %s, Status: %s, HTTP code: %s\n" "$mode" "$status" "$http_code"
