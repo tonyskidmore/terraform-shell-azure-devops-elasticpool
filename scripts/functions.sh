@@ -103,14 +103,46 @@ delete() {
 
 }
 
-
+# TODO:
+# json='{
+#   "agentInteractiveUI": false,
+#   "azureId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-vmss-azdo-agents-01/providers/Microsoft.Compute/virtualMachineScaleSets/vmss-portal-test-001",
+#   "desiredIdle": 0,
+#   "desiredSize": 0,
+#   "maxCapacity": 2,
+#   "maxSavedNodeCount": 0,
+#   "osType": "linux",
+#   "recycleAfterEachUse": false,
+#   "serviceEndpointId": "290659e0-6f38-49da-8f20-a29070687d7c",
+#   "serviceEndpointScope": "9e472165-b56d-4b28-a1ff-6d6c415d6ad3",
+#   "timeToLiveMinutes": 30,
+#   "offlineSince": "",
+#   "sizingAttempts": 0,
+#   "state": "online"
+# }'
+# input_state <<< "$json"
 input_state() {
   # read in state from stdin
   std_in=$(cat)
   printf "std_in: %s\n" "$std_in"
 }
 
-
+# TODO: test this
+# out='{
+#   "agentInteractiveUI": false,
+#   "azureId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-vmss-azdo-agents-01/providers/Microsoft.Compute/virtualMachineScaleSets/vmss-portal-test-001",
+#   "desiredIdle": 0,
+#   "maxCapacity": 2,
+#   "maxSavedNodeCount": 0,
+#   "osType": "linux",
+#   "recycleAfterEachUse": false,
+#   "serviceEndpointId": "290659e0-6f38-49da-8f20-a29070687d7c",
+#   "serviceEndpointScope": "9e472165-b56d-4b28-a1ff-6d6c415d6ad3",
+#   "timeToLiveMinutes": 30,
+#   "offlineSince": "yesterday",
+#   "state": "online"
+# }'
+# output_state
 output_state() {
   # save state from stdout
   printf "%s" "$out" | jq -r 'del(.offlineSince, .state)'
@@ -134,7 +166,8 @@ create_post_data()
   "serviceEndpointScope": "$project_id",
   "sizingAttempts": $ADO_POOL_SIZING_ATTEMPTS,
   "state": "online",
-  "timeToLiveMinutes": $ADO_POOL_TTL_MINS
+  "timeToLiveMinutes": $ADO_POOL_TTL_MINS,
+  "offlineSince": "yesterday"
 }
 EOF
 }
