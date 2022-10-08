@@ -3,10 +3,6 @@ resource "shell_script" "ado_vmss_pool" {
   dirty = false
 
   lifecycle_commands {
-    # create = file("${path.module}/scripts/create.sh")
-    # read   = file("${path.module}/scripts/read.sh")
-    # update = file("${path.module}/scripts/update.sh")
-    # delete = file("${path.module}/scripts/delete.sh")
     create = "bash ${path.module}/scripts/ado_elastic_pool.sh create"
     read   = "bash ${path.module}/scripts/ado_elastic_pool.sh read"
     update = "bash ${path.module}/scripts/ado_elastic_pool.sh update"

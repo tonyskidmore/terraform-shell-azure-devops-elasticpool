@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 create () {
 
   # Crud - Create operation
@@ -27,10 +28,7 @@ create () {
   url_suffix="&api-version=7.1-preview.1"
   if [[ "$ADO_PROJECT_ONLY" == "True" ]]
   then
-    # poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools?poolName=${ADO_POOL_NAME}&authorizeAllPipelines=${ADO_POOL_AUTH_ALL_PIPELINES}&autoProvisionProjectPools=${ADO_POOL_AUTO_PROVISION}&projectId=${project_id}&api-version=7.1-preview.1"
     url_suffix="&projectId=${project_id}${url_suffix}"
-  # else
-  #   poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools?poolName=${ADO_POOL_NAME}&authorizeAllPipelines=${ADO_POOL_AUTH_ALL_PIPELINES}&autoProvisionProjectPools=${ADO_POOL_AUTO_PROVISION}&api-version=7.1-preview.1"
   fi
   poolUrl="${url_prefix}${url_suffix}"
 
@@ -118,6 +116,7 @@ output_state() {
   printf "%s" "$out" | jq -r 'del(.offlineSince, .state)'
 }
 
+
 create_post_data()
 {
   cat <<EOF
@@ -188,9 +187,6 @@ rest_api_call() {
   fi
 
   params+=("--user" ":$AZURE_DEVOPS_EXT_PAT" "$url")
-
-  # uncomment for debug
-  # declare -p params
 
   # Run curl in a separate command, capturing output of -w "%{http_code}" into statuscode
   # and sending the content to a file with -o >(cat >/tmp/curl_body)

@@ -8,6 +8,7 @@ main () {
 }
 
 # shellcheck source=./scripts/functions.sh
+# shellcheck disable=SC1091
 source ./scripts/functions.sh
 mode="$1"
 main
