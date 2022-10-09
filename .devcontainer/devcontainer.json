@@ -57,7 +57,8 @@
 				"ms-python.vscode-pylance",
 				"hashicorp.terraform",
 				"timonwong.shellcheck",
-				"shardulm94.trailing-spaces"
+				"shardulm94.trailing-spaces",
+				"jetmartin.bats"
 			]
 		}
 	},

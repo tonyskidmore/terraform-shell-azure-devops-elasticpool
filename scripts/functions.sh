@@ -223,7 +223,7 @@ check_prereqs() {
     if ! check_command "$cmd"
     then
       raise "Module prerequisite not installed: $cmd"
-      exit 6
+      # exit 6
     fi
   done
 }
