@@ -4,8 +4,6 @@
 create () {
 
   # Crud - Create operation
-
-  prereqs
   printf "ADO_ORG: %s\n" "$ADO_ORG"
 
   # Get ADO projects to allow obtaining required project ID
@@ -66,7 +64,6 @@ create () {
 read() {
 
   # cRud - Read operation
-  prereqs
   input_state
   poolId=$(echo "$std_in" | jq -r '.poolId')
   printf "poolId: %s\n" "$poolId"
@@ -84,7 +81,6 @@ read() {
 update() {
 
   # crUd - Update operation
-  prereqs
   input_state
   pool_id=$(echo "$std_in" | jq -r '.poolId')
   endpoint_id=$(echo "$std_in" | jq -r '.serviceEndpointId')
@@ -107,7 +103,6 @@ update() {
 delete() {
 
   # cruD - Delete operation
-  prereqs
   input_state
   pool_id=$(echo "$std_in" | jq -r '.poolId')
 
@@ -215,7 +210,7 @@ raise()
 
 check_command () {
   # Determine if command is installed
-  command -v "${1}" 2>/dev/null
+  command -v "${1}" &>/dev/null
 }
 
 
@@ -235,7 +230,7 @@ check_prereqs() {
 
 
 prereqs() {
-  commands=("jq" "curl")
+  commands=("jq" "curl" "cat" "sed")
   check_prereqs "${commands[@]}"
 }
 

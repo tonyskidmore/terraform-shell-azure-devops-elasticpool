@@ -18,5 +18,6 @@ mode="$1"
 # to allow the distinction of being called from the command line or via source
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
+  prereqs
   main
 fi
