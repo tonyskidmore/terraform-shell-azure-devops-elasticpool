@@ -9,7 +9,6 @@ variable "ado_org" {
   description = "Azure DevOps Organization name"
 }
 
-
 variable "ado_service_connection" {
   type        = string
   description = "Azure DevOps azure service connection name"
@@ -27,7 +26,6 @@ variable "ado_project" {
 }
 
 # variables with predefined defaults
-
 
 variable "ado_project_only" {
   type        = string
@@ -50,6 +48,17 @@ variable "ado_pool_desired_size" {
   type        = number
   description = "The desired size of the pool"
   default     = 0
+}
+
+variable "ado_pool_os_type" {
+  type        = string
+  description = "Operating system type of the nodes in the pool"
+  default     = "linux"
+
+  validation {
+    condition     = contains(["linux", "windows"], var.ado_pool_os_type)
+    error_message = "ado_pool_os_type must be linux or windows."
+  }
 }
 
 variable "ado_pool_max_capacity" {

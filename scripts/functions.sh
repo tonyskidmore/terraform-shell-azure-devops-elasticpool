@@ -22,7 +22,7 @@ create () {
   endpoint_id=$(echo "$out" | jq -r '.value[].id')
   printf "endpoint_id: %s\n" "$endpoint_id"
 
-  # Only specify the optional project ID if the pool is only required in the specified project, deteremioned by if ADO_PROJECT_ONLY is True
+  # Only specify the optional project ID if the pool is only required in the specified project, determined by if ADO_PROJECT_ONLY is True
   # https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/elasticpools/create?view=azure-devops-rest-7.1
   url_prefix="${ADO_ORG}/_apis/distributedtask/elasticpools?poolName=${ADO_POOL_NAME}&authorizeAllPipelines=${ADO_POOL_AUTH_ALL_PIPELINES}&autoProvisionProjectPools=${ADO_POOL_AUTO_PROVISION}"
   url_suffix="&api-version=7.1-preview.1"
@@ -160,14 +160,13 @@ create_post_data()
   "maxCapacity": $ADO_POOL_MAX_CAPACITY,
   "maxSavedNodeCount": $ADO_POOL_MAX_SAVED_NODE_COUNT,
   "offlineSince": "",
-  "osType": "linux",
+  "osType": "$ADO_POOL_OS_TYPE",
   "recycleAfterEachUse": $ADO_POOL_RECYCLE_AFTER_USE,
   "serviceEndpointId": "$endpoint_id",
   "serviceEndpointScope": "$project_id",
   "sizingAttempts": $ADO_POOL_SIZING_ATTEMPTS,
   "state": "online",
-  "timeToLiveMinutes": $ADO_POOL_TTL_MINS,
-  "offlineSince": "yesterday"
+  "timeToLiveMinutes": $ADO_POOL_TTL_MINS
 }
 EOF
 }
@@ -182,7 +181,7 @@ update_post_data()
   "desiredIdle": $ADO_POOL_DESIRED_IDLE,
   "maxCapacity": $ADO_POOL_MAX_CAPACITY,
   "maxSavedNodeCount": $ADO_POOL_MAX_SAVED_NODE_COUNT,
-  "osType": "linux",
+  "osType": "$ADO_POOL_OS_TYPE",
   "recycleAfterEachUse": $ADO_POOL_RECYCLE_AFTER_USE,
   "serviceEndpointId": "$endpoint_id",
   "serviceEndpointScope": "$project_id",
