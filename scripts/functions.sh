@@ -5,6 +5,7 @@ create () {
 
   # Crud - Create operation
 
+  prereqs
   printf "ADO_ORG: %s\n" "$ADO_ORG"
 
   # Get ADO projects to allow obtaining required project ID
@@ -65,6 +66,7 @@ create () {
 read() {
 
   # cRud - Read operation
+  prereqs
   input_state
   poolId=$(echo "$std_in" | jq -r '.poolId')
   printf "poolId: %s\n" "$poolId"
@@ -82,6 +84,7 @@ read() {
 update() {
 
   # crUd - Update operation
+  prereqs
   input_state
   pool_id=$(echo "$std_in" | jq -r '.poolId')
   endpoint_id=$(echo "$std_in" | jq -r '.serviceEndpointId')
@@ -104,6 +107,7 @@ update() {
 delete() {
 
   # cruD - Delete operation
+  prereqs
   input_state
   pool_id=$(echo "$std_in" | jq -r '.poolId')
 
@@ -113,6 +117,7 @@ delete() {
   rest_api_call "DELETE" "$poolUrl"
 
 }
+
 
 # TODO:
 # json='{
@@ -201,6 +206,40 @@ update_post_data()
 EOF
 }
 
+
+raise()
+{
+  printf "%s\n" "$1" >&2
+}
+
+
+check_command () {
+  # Determine if command is installed
+  command -v "${1}" 2>/dev/null
+}
+
+
+check_prereqs() {
+
+  prereqs=("$@")
+
+  for cmd in "${prereqs[@]}"
+  do
+    if ! check_command "$cmd"
+    then
+      raise "Module prerequisite not installed: $cmd"
+      exit 6
+    fi
+  done
+}
+
+
+prereqs() {
+  commands=("jq" "curl")
+  check_prereqs "${commands[@]}"
+}
+
+
 build_params() {
 
   params=(
@@ -239,8 +278,6 @@ rest_api_call() {
 
   build_params "$method" "$url"
 
-  # Run curl in a separate command, capturing output of -w "%{http_code}" into statuscode
-  # and sending the content to a file with -o >(cat >/tmp/curl_body)
   printf "curl %s\n" "${params[*]}"
   res=$(curl "${params[@]}") || status=$?
 
@@ -260,7 +297,7 @@ checkout() {
 
   if [[ "$status" != "0" ]]
   then
-    printf "Operation failed. Mode: %s, Status: %s, HTTP code: %s\n" "$mode" "$status" "$http_code"  >&2
+    raise "Operation failed. Mode: $mode, Status: $status, HTTP code: $http_code"
     printf "%s\n" "$out"
     exit 1
   else
@@ -270,21 +307,22 @@ checkout() {
     else
       if [[ "$(echo "$out" | jq empty > /dev/null 2>&1; echo $?)" = "0" ]]
       then
-        echo "Parsed JSON successfully and got something other than false/null"
+        printf "Parsed JSON successfully and got something other than false/null\n"
         message="$(echo "$out" | jq -r '.message')"
-        printf "Error: %s\n" "$message" >&2
+        raise "Error: $message"
         exit 2
       else
-        printf "Failed to parse JSON, or got false/null.\n" >&2
+        printf "Failed to parse JSON, or got false/null\n"
         if echo "$out" | grep -q "_signin"
         then
-          printf "Azure DevOps PAT token is not correct\n" >&2
+          raise "Azure DevOps PAT token is not correct"
           exit 4
-        elif echo "$out" | grep -q "The resource cannot be found."
+        elif echo "$out" | grep -q "The resource cannot be found"
         then
-          printf "The resource cannot be found.\n" >&2
+          raise "The resource cannot be found"
           exit 5
         else
+        raise "Unknown error"
           printf "%s\n" "$out"
           exit 3
         fi
