@@ -66,7 +66,6 @@ read() {
 
   # cRud - Read operation
   input_state
-
   poolId=$(echo "$std_in" | jq -r '.poolId')
   printf "poolId: %s\n" "$poolId"
 
@@ -202,18 +201,13 @@ update_post_data()
 EOF
 }
 
-
-rest_api_call() {
-
-  status=0
-  local method="$1"
-  local url="$2"
-
-  printf "method: %s\n" "$method"
+build_params() {
 
   params=(
           "--silent" \
           "--show-error" \
+          "--max-time" "20" \
+          "--connect-timeout" "20" \
           "--write-out" "\n%{http_code}" \
           "--header" "Content-Type: application/json" \
           "--request" "$1"
@@ -230,7 +224,20 @@ rest_api_call() {
     params+=("--data" "$data")
   fi
 
-  params+=("--user" ":$AZURE_DEVOPS_EXT_PAT" "$url")
+  params+=("--user" ":$AZURE_DEVOPS_EXT_PAT" "$2")
+
+}
+
+
+rest_api_call() {
+
+  status=0
+  local method="$1"
+  local url="$2"
+
+  printf "method: %s\n" "$method"
+
+  build_params "$method" "$url"
 
   # Run curl in a separate command, capturing output of -w "%{http_code}" into statuscode
   # and sending the content to a file with -o >(cat >/tmp/curl_body)
