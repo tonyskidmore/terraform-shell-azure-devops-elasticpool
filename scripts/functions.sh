@@ -13,14 +13,26 @@ create () {
   rest_api_call "GET" "$projectUrl"
   project=$(printf "%s" "$out" | jq -r --arg name "$ADO_PROJECT" '.value[] | select (.name==$name)')
   project_id=$(echo "$project" | jq -r '.id')
-  printf "project_id: %s\n" "$project_id"
+  if [[ -n "$project_id" ]]
+  then
+    printf "project_id: %s\n" "$project_id"
+  else
+    printf "Failed to obtain project_id for project: %s\n" "$ADO_PROJECT" >&2
+    exit 1
+  fi
 
   # Get endpoint ID of the specified service connection in the target project
   # https://learn.microsoft.com/en-us/rest/api/azure/devops/serviceendpoint/endpoints/get-service-endpoints-by-names?view=azure-devops-rest-6.0&tabs=HTTP
   endpointUrl="$ADO_ORG/$ADO_PROJECT/_apis/serviceendpoint/endpoints?endpointNames=$ADO_SERVICE_CONNECTION&api-version=6.0-preview.4"
   rest_api_call "GET" "$endpointUrl"
   endpoint_id=$(echo "$out" | jq -r '.value[].id')
-  printf "endpoint_id: %s\n" "$endpoint_id"
+  if [[ -n "$endpoint_id" ]]
+  then
+    printf "endpoint_id: %s\n" "$endpoint_id"
+  else
+    printf "Failed to obtain endpoint_id for service connection: %s\n" "$ADO_SERVICE_CONNECTION" >&2
+    exit 1
+  fi
 
   # Only specify the optional project ID if the pool is only required in the specified project, determined by if ADO_PROJECT_ONLY is True
   # https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/elasticpools/create?view=azure-devops-rest-7.1
@@ -239,40 +251,38 @@ rest_api_call() {
 
 checkout() {
 
-  if [[ "$mode" != "delete" && "$http_code" != "200" ]]
+  if [[ "$status" != "0" ]]
   then
-    if [[ "$(echo "$out" | jq empty > /dev/null 2>&1; echo $?)" = "0" ]]
-    then
-      echo "Parsed JSON successfully and got something other than false/null"
-      message="$(echo "$out" | jq -r '.message')"
-      printf "Error: %s\n" "$message" >&2
-      exit 1
-    else
-      printf "Failed to parse JSON, or got false/null.\n" >&2
-      if echo "$out" | grep -q "_signin"
-      then
-        printf "Azure DevOps PAT token is not correct\n" >&2
-        exit 1
-      elif echo "$out" | grep -q "The resource cannot be found."
-      then
-        printf "The resource cannot be found.\n" >&2
-        exit 1
-      else
-        printf "%s\n" "$out"
-        exit 1
-      fi
-    fi
-  elif [[ "$mode" == "delete" && "$http_code" != "204" ]]
-  then
-    printf "Destroy operation did not return expected 204, returned: %s.\n" "$http_code" >&2
-    exit 1
-  elif [[ "$status" != "0" ]]
-  then
-    printf "status: %s\n" "$status"  >&2
+    printf "Operation failed. Mode: %s, Status: %s, HTTP code: %s\n" "$mode" "$status" "$http_code"  >&2
     printf "%s\n" "$out"
     exit 1
+  else
+    if [[ "$mode" != "delete" && "$http_code" == "200" ]] || [[ "$mode" == "delete" && "$http_code" == "204" ]]
+    then
+      printf "Operation successful. Mode: %s, Status: %s, HTTP code: %s\n" "$mode" "$status" "$http_code"
+    else
+      if [[ "$(echo "$out" | jq empty > /dev/null 2>&1; echo $?)" = "0" ]]
+      then
+        echo "Parsed JSON successfully and got something other than false/null"
+        message="$(echo "$out" | jq -r '.message')"
+        printf "Error: %s\n" "$message" >&2
+        exit 2
+      else
+        printf "Failed to parse JSON, or got false/null.\n" >&2
+        if echo "$out" | grep -q "_signin"
+        then
+          printf "Azure DevOps PAT token is not correct\n" >&2
+          exit 4
+        elif echo "$out" | grep -q "The resource cannot be found."
+        then
+          printf "The resource cannot be found.\n" >&2
+          exit 5
+        else
+          printf "%s\n" "$out"
+          exit 3
+        fi
+      fi
+    fi
   fi
-
-  printf "Operation successful. Mode: %s, Status: %s, HTTP code: %s\n" "$mode" "$status" "$http_code"
 
 }
