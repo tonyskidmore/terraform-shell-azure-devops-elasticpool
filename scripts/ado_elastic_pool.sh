@@ -3,20 +3,19 @@
 set -e
 
 main () {
-  # shellcheck source=./scripts/functions.sh
-  # shellcheck disable=SC1091
-  source ./scripts/functions.sh
   prereqs
   printf "mode: %s\n" "$mode"
-  $mode
+  "${mode}_func"
 }
+
+# shellcheck source=./scripts/functions.sh
+# shellcheck disable=SC1091
+source ./scripts/functions.sh
 
 # similar method in bash to the Python:
 # if __name__ == "__main__":
 #     main()
 # to allow the distinction of being called from the command line or via source
-
-
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
 then
   mode="$1"

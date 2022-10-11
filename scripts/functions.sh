@@ -1,7 +1,11 @@
 #!/bin/bash
 
+hello () {
+  echo "hello"
+}
 
-create () {
+
+create_func () {
 
   # Crud - Create operation
   printf "ADO_ORG: %s\n" "$ADO_ORG"
@@ -61,7 +65,7 @@ create () {
 }
 
 
-read() {
+read_func() {
 
   # cRud - Read operation
   input_state
@@ -78,7 +82,7 @@ read() {
 }
 
 
-update() {
+update_func() {
 
   # crUd - Update operation
   input_state
@@ -100,7 +104,7 @@ update() {
 }
 
 
-delete() {
+delete_func() {
 
   # cruD - Delete operation
   input_state
@@ -202,8 +206,7 @@ EOF
 }
 
 
-raise()
-{
+raise() {
   printf "%s\n" "$1" >&2
 }
 
@@ -222,20 +225,23 @@ check_prereqs() {
   do
     if ! check_command "$cmd"
     then
-      raise "Module prerequisite not installed: $cmd"
-      # exit 6
+      # raise "Module prerequisite not installed: $cmd"
+      exit 6
     fi
   done
 }
 
-
+# TODO: if this supplys bad command ends up in broken loop
 prereqs() {
-  commands=("jq" "curl" "cat" "sed")
-  check_prereqs "${commands[@]}"
+  cmds=("jq" "curl" "cat" "sed")
+  check_prereqs "${cmds[@]}"
 }
 
 
 build_params() {
+
+  local method="$1"
+  local url="$2"
 
   params=(
           "--silent" \
@@ -244,7 +250,7 @@ build_params() {
           "--connect-timeout" "20" \
           "--write-out" "\n%{http_code}" \
           "--header" "Content-Type: application/json" \
-          "--request" "$1"
+          "--request" "$method"
   )
 
   if [[ "$method" == "POST" || "$method" == "PATCH" ]]
@@ -258,14 +264,14 @@ build_params() {
     params+=("--data" "$data")
   fi
 
-  params+=("--user" ":$AZURE_DEVOPS_EXT_PAT" "$2")
+  params+=("--user" ":$AZURE_DEVOPS_EXT_PAT" "$url")
 
 }
 
 
 rest_api_call() {
 
-  status=0
+  exit_code=0
   local method="$1"
   local url="$2"
 
@@ -274,7 +280,8 @@ rest_api_call() {
   build_params "$method" "$url"
 
   printf "curl %s\n" "${params[*]}"
-  res=$(curl "${params[@]}") || status=$?
+  res=$(curl "${params[@]}")
+  exit_code=$?
 
   # https://unix.stackexchange.com/questions/572424/retrieve-both-http-status-code-and-content-from-curl-in-a-shell-script
   http_code=$(tail -n1 <<< "$res") # get the last line
@@ -290,15 +297,16 @@ rest_api_call() {
 
 checkout() {
 
-  if [[ "$status" != "0" ]]
+  if [[ "$exit_code" != "0" ]]
   then
-    raise "Operation failed. Mode: $mode, Status: $status, HTTP code: $http_code"
+    raise "Operation failed. Mode: $mode, exit_code: $exit_code, HTTP code: $http_code"
     printf "%s\n" "$out"
     exit 1
   else
+    echo "out"
     if [[ "$mode" != "delete" && "$http_code" == "200" ]] || [[ "$mode" == "delete" && "$http_code" == "204" ]]
     then
-      printf "Operation successful. Mode: %s, Status: %s, HTTP code: %s\n" "$mode" "$status" "$http_code"
+      printf "Operation successful. Mode: %s, exit_code: %s, HTTP code: %s\n" "$mode" "$exit_code" "$http_code"
     else
       if [[ "$(echo "$out" | jq empty > /dev/null 2>&1; echo $?)" = "0" ]]
       then
