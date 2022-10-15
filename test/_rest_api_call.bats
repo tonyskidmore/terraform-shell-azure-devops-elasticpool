@@ -5,10 +5,13 @@ setup() {
 
 # the tests for the rest_api_call function use pre-created curl output
 # so are mainly targeted at confirming the checkout function behaves as expected
+# and the various expected curl results
 
-@test "prereqs" {
-  run prereqs
-  assert_success
+@test "rest_api_call_000" {
+  # negative test for calling function with incorrect number of parameters
+  run rest_api_call
+  assert_failure
+  assert_output --partial 'Expected 2 function arguments, got 0'
 }
 
 @test "rest_api_call_001" {
@@ -88,6 +91,21 @@ setup() {
   assert_output --partial 'http_code: 404'
   assert_failure 2
   unset curl
+}
+
+@test "rest_api_call_007" {
+  # negative test for a non-existent elasticpool ID
+  # dummy url parameter
+  run rest_api_call PUT https://dev.azure.com/tonyskidmore/_apis/distributedtask/elasticpools/276?api-version=7.1-preview.1
+  assert_failure
+  assert_output --partial 'Expected method to be one of: GET,POST,PATCH.DELETE got PUT'
+}
+
+@test "rest_api_call_008" {
+  # negative test for invalid URL
+  run rest_api_call GET http://dev.azure.com/tonyskidmore/_apis/projects?api-version=6.0
+  assert_failure
+  assert_output --partial 'Invalid or missing URL: http://dev.azure.com/tonyskidmore/_apis/projects?api-version=6.0'
 }
 
 # teardown() {

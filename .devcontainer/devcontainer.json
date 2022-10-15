@@ -58,7 +58,8 @@
 				"hashicorp.terraform",
 				"timonwong.shellcheck",
 				"shardulm94.trailing-spaces",
-				"jetmartin.bats"
+				"jetmartin.bats",
+				"streetsidesoftware.code-spell-checker"
 			]
 		}
 	},

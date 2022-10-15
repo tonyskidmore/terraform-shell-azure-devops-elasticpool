@@ -267,10 +267,32 @@ build_params() {
 rest_api_call() {
 
   exit_code=0
+
+  if [ "$#" -ne 2 ]
+  then
+      printf "Expected 2 function arguments, got %s\n" "$#"
+      exit 1
+  fi
+
   local method="$1"
   local url="$2"
 
-  printf "method: %s\n" "$method"
+
+  if [[ "$method" == "GET" || "$method" == "POST" || "$method" == "PATCH" || "$method" == "DELETE" ]]
+  then
+    printf "method: %s\n" "$method"
+  else
+    printf "Expected method to be one of: GET,POST,PATCH.DELETE got %s\n" "$method"
+    exit 1
+  fi
+
+  if [[ $url =~ ^https:\/\/.+\/_apis.+$ ]]
+  then
+    printf "url: %s\n" "$url"
+  else
+    printf "Invalid or missing URL: %s\n" "$url"
+    exit 1
+  fi
 
   build_params "$method" "$url"
 

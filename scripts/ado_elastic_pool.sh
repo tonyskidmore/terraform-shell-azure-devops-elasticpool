@@ -21,11 +21,11 @@ then
   mode="$1"
   case $mode in
     create|read|update|delete)
-      # will hang on reading stdin if ran directlty from shell
+      # will hang on reading stdin if ran directly from shell
       # so do a simple test to avoid that
       # [[ -n "$ADO_POOL_NAME" ]] && main ;;
       main ;;
     *)
-      echo "Only accepts create, read, update or delete" ;;
+      echo "Only accepts create, read, update or delete" ; exit 1;;
   esac
 fi
