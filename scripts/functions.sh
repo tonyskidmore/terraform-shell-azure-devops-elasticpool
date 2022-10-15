@@ -1,10 +1,5 @@
 #!/bin/bash
 
-hello () {
-  echo "hello"
-}
-
-
 create_func () {
 
   # Crud - Create operation

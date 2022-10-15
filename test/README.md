@@ -23,3 +23,5 @@ git submodule add https://github.com/bats-core/bats-assert.git test/test_helper/
 
 
 ./test/bats/bin/bats test/test.bats
+
+./test/bats/bin/bats -p ./test
