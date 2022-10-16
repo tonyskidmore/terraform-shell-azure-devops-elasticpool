@@ -3,7 +3,6 @@
 create_func () {
 
   # Crud - Create operation
-  printf "ADO_ORG: %s\n" "$ADO_ORG"
 
   get_projects
   get_endpoint
@@ -17,17 +16,6 @@ create_func () {
   # switch to read mode and store details in state
   mode="read"
   get_elasticpool_by_id
-
-  # # query the new pool using the poolId returned by the create REST API call
-  # # https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/elasticpools/get?view=azure-devops-rest-7.1
-  # poolId=$(echo "$out" | jq -r .elasticPool.poolId)
-  # poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools/${poolId}?api-version=7.1-preview.1"
-  # printf "poolId: %s\n" "$poolId"
-  # printf "poolUrl: %s\n" "$poolUrl"
-  # rest_api_call "GET" "$poolUrl"
-
-  # # this will be what gets saved to state
-  # output_state
 
 }
 
@@ -71,6 +59,37 @@ delete_func() {
   # build url and make call for delete rest api method
   build_pool_url
   rest_api_call "DELETE" "$poolUrl"
+
+}
+
+
+env_not_set() {
+  printf "%s must be set before executing this script\n" "$1"
+  ((failed_count++))
+}
+
+
+check_env_vars() {
+
+  failed_count=0
+  [[ -z "$ADO_ORG" ]] && env_not_set "ADO_ORG"
+  [[ -z "$ADO_POOL_AUTH_ALL_PIPELINES" ]] && env_not_set "ADO_POOL_AUTH_ALL_PIPELINES"
+  [[ -z "$ADO_POOL_AUTO_PROVISION" ]] && env_not_set "ADO_POOL_AUTO_PROVISION"
+  [[ -z "$ADO_POOL_DESIRED_IDLE" ]] && env_not_set "ADO_POOL_DESIRED_IDLE"
+  [[ -z "$ADO_POOL_DESIRED_SIZE" ]] && env_not_set "ADO_POOL_DESIRED_SIZE"
+  [[ -z "$ADO_POOL_MAX_CAPACITY" ]] && env_not_set "ADO_POOL_MAX_CAPACITY"
+  [[ -z "$ADO_POOL_MAX_SAVED_NODE_COUNT" ]] && env_not_set "ADO_POOL_MAX_SAVED_NODE_COUNT"
+  [[ -z "$ADO_POOL_NAME" ]] && env_not_set "ADO_POOL_NAME"
+  [[ -z "$ADO_POOL_OS_TYPE" ]] && env_not_set "ADO_POOL_OS_TYPE"
+  [[ -z "$ADO_POOL_RECYCLE_AFTER_USE" ]] && env_not_set "ADO_POOL_RECYCLE_AFTER_USE"
+  [[ -z "$ADO_POOL_SIZING_ATTEMPTS" ]] && env_not_set "ADO_POOL_SIZING_ATTEMPTS"
+  [[ -z "$ADO_POOL_TTL_MINS" ]] && env_not_set "ADO_POOL_TTL_MINS"
+  [[ -z "$ADO_PROJECT" ]] && env_not_set "ADO_PROJECT"
+  [[ -z "$ADO_PROJECT_ONLY" ]] && env_not_set "ADO_PROJECT_ONLY"
+  [[ -z "$ADO_SERVICE_CONNECTION" ]] && env_not_set "ADO_SERVICE_CONNECTION"
+  [[ -z "$AZ_VMSS_ID" ]] && env_not_set "AZ_VMSS_ID"
+  [[ -z "$AZURE_DEVOPS_EXT_PAT" ]] && env_not_set "AZURE_DEVOPS_EXT_PAT"
+  [[ $failed_count -ne 0 ]] && exit 1
 
 }
 

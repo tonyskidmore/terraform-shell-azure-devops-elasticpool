@@ -1,9 +1,12 @@
 #!/bin/bash
 
-set -e
+set -eo pipefail
 
 main () {
+  # TODO: fix this function
+  # check_env_vars
   prereqs
+  # will hang on reading stdin if ran directly from shell
   printf "mode: %s\n" "$mode"
   "${mode}_func"
 }
@@ -21,9 +24,6 @@ then
   mode="$1"
   case $mode in
     create|read|update|delete)
-      # will hang on reading stdin if ran directly from shell
-      # so do a simple test to avoid that
-      # [[ -n "$ADO_POOL_NAME" ]] && main ;;
       main ;;
     *)
       echo "Only accepts create, read, update or delete" ; exit 1;;
