@@ -62,7 +62,7 @@ setup() {
   # dummy parameters
   run rest_api_call GET https://dev.azure.com/tonyskidmore/_apis/projects?api-version=6.0
   assert_failure 1
-  assert_output --partial 'Operation failed. Mode: , exit_code: 6, HTTP code:'
+  assert_output --partial 'Operation failed. Mode: , Method: GET, exit_code: 6, HTTP code:'
   unset curl
 }
 
@@ -75,7 +75,7 @@ setup() {
   # dummy parameters
   run rest_api_call GET https://dev.azure.com/tonyskidmore/_apis/distributedtask/elasticpools/275?api-version=7.1-preview.1
   assert_success
-  assert_output --partial 'Operation successful. Mode: , exit_code: 0, HTTP code: 200'
+  assert_output --partial 'Operation successful. Mode: , Method: GET, exit_code: 0, HTTP code: 200'
   unset curl
 }
 

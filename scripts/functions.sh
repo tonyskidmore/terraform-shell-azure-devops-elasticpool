@@ -5,57 +5,29 @@ create_func () {
   # Crud - Create operation
   printf "ADO_ORG: %s\n" "$ADO_ORG"
 
-  # Get ADO projects to allow obtaining required project ID
-  # https://learn.microsoft.com/en-us/rest/api/azure/devops/core/projects/get?view=azure-devops-rest-6.0
-  projectUrl="$ADO_ORG/_apis/projects?api-version=6.0"
-  rest_api_call "GET" "$projectUrl"
-  project=$(printf "%s" "$out" | jq -r --arg name "$ADO_PROJECT" '.value[] | select (.name==$name)')
-  project_id=$(echo "$project" | jq -r '.id')
-  if [[ -n "$project_id" ]]
-  then
-    printf "project_id: %s\n" "$project_id"
-  else
-    printf "Failed to obtain project_id for project: %s\n" "$ADO_PROJECT" >&2
-    exit 1
-  fi
-
-  # Get endpoint ID of the specified service connection in the target project
-  # https://learn.microsoft.com/en-us/rest/api/azure/devops/serviceendpoint/endpoints/get-service-endpoints-by-names?view=azure-devops-rest-6.0&tabs=HTTP
-  endpointUrl="$ADO_ORG/$ADO_PROJECT/_apis/serviceendpoint/endpoints?endpointNames=$ADO_SERVICE_CONNECTION&api-version=6.0-preview.4"
-  rest_api_call "GET" "$endpointUrl"
-  endpoint_id=$(echo "$out" | jq -r '.value[].id')
-  if [[ -n "$endpoint_id" ]]
-  then
-    printf "endpoint_id: %s\n" "$endpoint_id"
-  else
-    printf "Failed to obtain endpoint_id for service connection: %s\n" "$ADO_SERVICE_CONNECTION" >&2
-    exit 1
-  fi
-
-  # Only specify the optional project ID if the pool is only required in the specified project, determined by if ADO_PROJECT_ONLY is True
-  # https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/elasticpools/create?view=azure-devops-rest-7.1
-  url_prefix="${ADO_ORG}/_apis/distributedtask/elasticpools?poolName=${ADO_POOL_NAME}&authorizeAllPipelines=${ADO_POOL_AUTH_ALL_PIPELINES}&autoProvisionProjectPools=${ADO_POOL_AUTO_PROVISION}"
-  url_suffix="&api-version=7.1-preview.1"
-  if [[ "$ADO_PROJECT_ONLY" == "True" ]]
-  then
-    url_suffix="&projectId=${project_id}${url_suffix}"
-  fi
-  poolUrl="${url_prefix}${url_suffix}"
+  get_projects
+  get_endpoint
+  build_pool_url
 
   # Create the elasticpool
-  printf "poolUrl: %s\n" "$poolUrl"
   rest_api_call "POST" "$poolUrl"
 
-  # query the new pool using the poolId returned by the create REST API call
-  # https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/elasticpools/get?view=azure-devops-rest-7.1
-  poolId=$(echo "$out" | jq -r .elasticPool.poolId)
-  poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools/${poolId}?api-version=7.1-preview.1"
-  printf "poolId: %s\n" "$poolId"
-  printf "poolUrl: %s\n" "$poolUrl"
-  rest_api_call "GET" "$poolUrl"
+  # get the poolId of the new elasticpool
+  pool_id=$(echo "$out" | jq -r .elasticPool.poolId)
+  # switch to read mode and store details in state
+  mode="read"
+  get_elasticpool_by_id
 
-  # this will be what gets saved to state
-  output_state
+  # # query the new pool using the poolId returned by the create REST API call
+  # # https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/elasticpools/get?view=azure-devops-rest-7.1
+  # poolId=$(echo "$out" | jq -r .elasticPool.poolId)
+  # poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools/${poolId}?api-version=7.1-preview.1"
+  # printf "poolId: %s\n" "$poolId"
+  # printf "poolUrl: %s\n" "$poolUrl"
+  # rest_api_call "GET" "$poolUrl"
+
+  # # this will be what gets saved to state
+  # output_state
 
 }
 
@@ -63,38 +35,28 @@ create_func () {
 read_func() {
 
   # cRud - Read operation
+
+  # get current state
   input_state
-  poolId=$(echo "$std_in" | jq -r '.poolId')
-  printf "poolId: %s\n" "$poolId"
-
-  # https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/elasticpools/get?view=azure-devops-rest-7.1
-  poolUrl="$ADO_ORG/_apis/distributedtask/elasticpools/${poolId}?api-version=7.1-preview.1"
-
-  rest_api_call "GET" "$poolUrl"
-
-  output_state
+  # update state
+  get_elasticpool_by_id
 
 }
+
 
 
 update_func() {
 
   # crUd - Update operation
+
+  # get current status
   input_state
-  pool_id=$(echo "$std_in" | jq -r '.poolId')
-  endpoint_id=$(echo "$std_in" | jq -r '.serviceEndpointId')
-  project_id=$(echo "$std_in" | jq -r '.serviceEndpointScope')
 
-  # https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/elasticpools/update?view=azure-devops-rest-7.1
-  poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools/$pool_id?api-version=7.1-preview.1"
-
+  # build url and make call for update rest api method
+  build_pool_url
   rest_api_call "PATCH" "$poolUrl"
-
-  # do GET - this will be what gets saved to state
-  poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools/$pool_id?api-version=7.1-preview.1"
-
-  rest_api_call "GET" "$poolUrl"
-  output_state
+  # update state
+  get_elasticpool_by_id
 
 }
 
@@ -102,39 +64,24 @@ update_func() {
 delete_func() {
 
   # cruD - Delete operation
+
+  # get current state
   input_state
-  pool_id=$(echo "$std_in" | jq -r '.poolId')
 
-  # https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/agents/delete?view=azure-devops-rest-7.1
-  poolUrl="$ADO_ORG/_apis/distributedtask/pools/$pool_id?api-version=7.1-preview.1"
-
+  # build url and make call for delete rest api method
+  build_pool_url
   rest_api_call "DELETE" "$poolUrl"
 
 }
 
 
-# TODO:
-# json='{
-#   "agentInteractiveUI": false,
-#   "azureId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-vmss-azdo-agents-01/providers/Microsoft.Compute/virtualMachineScaleSets/vmss-portal-test-001",
-#   "desiredIdle": 0,
-#   "desiredSize": 0,
-#   "maxCapacity": 2,
-#   "maxSavedNodeCount": 0,
-#   "osType": "linux",
-#   "recycleAfterEachUse": false,
-#   "serviceEndpointId": "290659e0-6f38-49da-8f20-a29070687d7c",
-#   "serviceEndpointScope": "9e472165-b56d-4b28-a1ff-6d6c415d6ad3",
-#   "timeToLiveMinutes": 30,
-#   "offlineSince": "",
-#   "sizingAttempts": 0,
-#   "state": "online"
-# }'
-# input_state <<< "$json"
 input_state() {
   # read in state from stdin
   std_in=$(cat)
   printf "std_in: %s\n" "$std_in"
+  pool_id=$(echo "$std_in" | jq -r '.poolId')
+  endpoint_id=$(echo "$std_in" | jq -r '.serviceEndpointId')
+  project_id=$(echo "$std_in" | jq -r '.serviceEndpointScope')
 }
 
 # TODO: test this
@@ -156,6 +103,83 @@ input_state() {
 output_state() {
   # save state from stdout
   printf "%s" "$out" | jq -r 'del(.offlineSince, .state)'
+}
+
+
+get_projects() {
+
+  # Get ADO projects to allow obtaining required project ID
+  # https://learn.microsoft.com/en-us/rest/api/azure/devops/core/projects/get?view=azure-devops-rest-6.0
+  projectUrl="$ADO_ORG/_apis/projects?api-version=6.0"
+  rest_api_call "GET" "$projectUrl"
+  project=$(printf "%s" "$out" | jq -r --arg name "$ADO_PROJECT" '.value[] | select (.name==$name)')
+  project_id=$(echo "$project" | jq -r '.id')
+  if [[ -n "$project_id" ]]
+  then
+    printf "project_id: %s\n" "$project_id"
+  else
+    printf "Failed to obtain project_id for project: %s\n" "$ADO_PROJECT" >&2
+    exit 1
+  fi
+
+}
+
+
+get_endpoint() {
+
+  # Get endpoint ID of the specified service connection in the target project
+  # https://learn.microsoft.com/en-us/rest/api/azure/devops/serviceendpoint/endpoints/get-service-endpoints-by-names?view=azure-devops-rest-6.0&tabs=HTTP
+  endpointUrl="$ADO_ORG/$ADO_PROJECT/_apis/serviceendpoint/endpoints?endpointNames=$ADO_SERVICE_CONNECTION&api-version=6.0-preview.4"
+  rest_api_call "GET" "$endpointUrl"
+  endpoint_id=$(echo "$out" | jq -r '.value[].id')
+  if [[ -n "$endpoint_id" ]]
+  then
+    printf "endpoint_id: %s\n" "$endpoint_id"
+  else
+    printf "Failed to obtain endpoint_id for service connection: %s\n" "$ADO_SERVICE_CONNECTION" >&2
+    exit 1
+  fi
+
+}
+
+
+build_pool_url() {
+
+  # https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/elasticpools?view=azure-devops-rest-7.1
+  # mode is global varaiable defined in parent script
+  # shellcheck disable=SC2154
+  if [[ "$mode" == "read" || "$mode" == "update" ]]
+  then
+    poolUrl="${ADO_ORG}/_apis/distributedtask/elasticpools/$pool_id?api-version=7.1-preview.1"
+  elif [[ "$mode" == "delete" ]]
+  then
+    # https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/agents/delete?view=azure-devops-rest-7.1
+    poolUrl="${ADO_ORG}/_apis/distributedtask/pools/$pool_id?api-version=7.1-preview.1"
+  elif [[ "$mode" == "create" ]]
+  then
+    # Only specify the optional project ID if the pool is only required in the specified project, determined by if ADO_PROJECT_ONLY is True
+    # https://learn.microsoft.com/en-us/rest/api/azure/devops/distributedtask/elasticpools/create?view=azure-devops-rest-7.1
+    url_prefix="${ADO_ORG}/_apis/distributedtask/elasticpools?poolName=${ADO_POOL_NAME}&authorizeAllPipelines=${ADO_POOL_AUTH_ALL_PIPELINES}&autoProvisionProjectPools=${ADO_POOL_AUTO_PROVISION}"
+    url_suffix="&api-version=7.1-preview.1"
+    if [[ "$ADO_PROJECT_ONLY" == "True" ]]
+    then
+      url_suffix="&projectId=${project_id}${url_suffix}"
+    fi
+    poolUrl="${url_prefix}${url_suffix}"
+  else
+    raise "Failed to build pool URL"
+    exit 1
+  fi
+
+}
+
+
+get_elasticpool_by_id() {
+
+  build_pool_url
+  rest_api_call "GET" "$poolUrl"
+  output_state
+
 }
 
 
@@ -274,7 +298,7 @@ rest_api_call() {
       exit 1
   fi
 
-  local method="$1"
+  method="$1"
   local url="$2"
 
 
@@ -316,14 +340,14 @@ checkout() {
 
   if [[ "$exit_code" != "0" ]]
   then
-    raise "Operation failed. Mode: $mode, exit_code: $exit_code, HTTP code: $http_code"
+    raise "Operation failed. Mode: $mode, Method: $method, exit_code: $exit_code, HTTP code: $http_code"
     printf "%s\n" "$out"
     exit 1
   else
     echo "out"
     if [[ "$mode" != "delete" && "$http_code" == "200" ]] || [[ "$mode" == "delete" && "$http_code" == "204" ]]
     then
-      printf "Operation successful. Mode: %s, exit_code: %s, HTTP code: %s\n" "$mode" "$exit_code" "$http_code"
+      printf "Operation successful. Mode: %s, Method: %s, exit_code: %s, HTTP code: %s\n" "$mode" "$method" "$exit_code" "$http_code"
     else
       if [[ "$(echo "$out" | jq empty > /dev/null 2>&1; echo $?)" = "0" ]]
       then
