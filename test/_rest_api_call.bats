@@ -75,7 +75,7 @@ setup() {
   # dummy parameters
   run rest_api_call GET https://dev.azure.com/tonyskidmore/_apis/distributedtask/elasticpools/275?api-version=7.1-preview.1
   assert_success
-  assert_output --partial 'Operation successful. Mode: , Method: GET, exit_code: 0, HTTP code: 200'
+  assert_output --partial 'Operation successful. Service: distributedtask, Mode: , Method: GET, exit_code: 0, HTTP code: 200'
   unset curl
 }
 

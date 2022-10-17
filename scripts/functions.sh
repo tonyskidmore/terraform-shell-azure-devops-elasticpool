@@ -64,7 +64,7 @@ delete_func() {
 
 
 env_not_set() {
-  printf "%s must be set before executing this script\n" "$1"
+  raise "$1 must be set before executing this script"
   ((failed_count++))
 }
 
@@ -318,7 +318,7 @@ rest_api_call() {
   fi
 
   method="$1"
-  local url="$2"
+  url="$2"
 
 
   if [[ "$method" == "GET" || "$method" == "POST" || "$method" == "PATCH" || "$method" == "DELETE" ]]
@@ -366,7 +366,9 @@ checkout() {
     echo "out"
     if [[ "$mode" != "delete" && "$http_code" == "200" ]] || [[ "$mode" == "delete" && "$http_code" == "204" ]]
     then
-      printf "Operation successful. Mode: %s, Method: %s, exit_code: %s, HTTP code: %s\n" "$mode" "$method" "$exit_code" "$http_code"
+      regex="_apis\/([a-z]+)"
+      [[ $url =~ $regex ]] && service="${BASH_REMATCH[1]}"
+      printf "Operation successful. Service: %s, Mode: %s, Method: %s, exit_code: %s, HTTP code: %s\n" "$service" "$mode" "$method" "$exit_code" "$http_code"
     else
       if [[ "$(echo "$out" | jq empty > /dev/null 2>&1; echo $?)" = "0" ]]
       then

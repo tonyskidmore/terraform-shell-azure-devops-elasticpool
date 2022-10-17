@@ -22,6 +22,6 @@ git submodule add https://github.com/bats-core/bats-support.git test/test_helper
 git submodule add https://github.com/bats-core/bats-assert.git test/test_helper/bats-assert
 
 
-./test/bats/bin/bats test/test.bats
+~~./test/bats/bin/bats test/test.bats~~
 
 ./test/bats/bin/bats -p ./test
