@@ -1,13 +1,8 @@
 #!/bin/bash
 
-# set -eo pipefail
-# set -e
-
 main () {
-  # TODO: fix this function
   check_env_vars
   prereqs
-  # will hang on reading stdin if ran directly from shell
   printf "mode: %s\n" "$mode"
   "${mode}_func"
 }

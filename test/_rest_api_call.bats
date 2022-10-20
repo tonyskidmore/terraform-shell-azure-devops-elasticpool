@@ -7,14 +7,14 @@ setup() {
 # so are mainly targeted at confirming the checkout function behaves as expected
 # and the various expected curl results
 
-@test "rest_api_call_000" {
+@test "failureIncorrectParameters" {
   # negative test for calling function with incorrect number of parameters
   run rest_api_call
   assert_failure
   assert_output --partial 'Expected 2 function arguments, got 0'
 }
 
-@test "rest_api_call_001" {
+@test "successGetProject" {
   # positive test with succesful project get response
   function curl(){
     cat "$DIR/data/test_001_rest_api_call"
@@ -26,7 +26,7 @@ setup() {
   unset curl
 }
 
-@test "rest_api_call_002" {
+@test "failureInvalidOrg" {
   # negative test for invalid organization name
   function curl(){
     cat "$DIR/data/test_002_rest_api_call"
@@ -40,7 +40,7 @@ setup() {
   unset curl
 }
 
-@test "rest_api_call_003" {
+@test "failureInvalidPAT" {
   # negative test with an invalid PAT token
   function curl(){
     cat "$DIR/data/test_003_rest_api_call"
@@ -53,7 +53,7 @@ setup() {
   unset curl
 }
 
-@test "rest_api_call_004" {
+@test "failureUknownExit" {
   # negative test with an unexpected exit code
   function curl(){
     exit 6
@@ -66,8 +66,8 @@ setup() {
   unset curl
 }
 
-@test "rest_api_call_005" {
-  # positive test with succesful project get response
+@test "successPoolGet" {
+  # positive test with succesful pool get response
   function curl(){
     cat "$DIR/data/test_005_rest_api_call"
   }
@@ -79,7 +79,7 @@ setup() {
   unset curl
 }
 
-@test "rest_api_call_006" {
+@test "failurePoolGet" {
   # negative test for a non-existent elasticpool ID
   function curl(){
     cat "$DIR/data/test_006_rest_api_call"
@@ -93,22 +93,17 @@ setup() {
   unset curl
 }
 
-@test "rest_api_call_007" {
-  # negative test for a non-existent elasticpool ID
+@test "failureIncorrectMethod" {
+  # negative test for an incorrect HTTP method
   # dummy url parameter
   run rest_api_call PUT https://dev.azure.com/tonyskidmore/_apis/distributedtask/elasticpools/276?api-version=7.1-preview.1
   assert_failure
   assert_output --partial 'Expected method to be one of: GET,POST,PATCH.DELETE got PUT'
 }
 
-@test "rest_api_call_008" {
+@test "failureInvalidUrl" {
   # negative test for invalid URL
   run rest_api_call GET http://dev.azure.com/tonyskidmore/_apis/projects?api-version=6.0
   assert_failure
   assert_output --partial 'Invalid or missing URL: http://dev.azure.com/tonyskidmore/_apis/projects?api-version=6.0'
 }
-
-# teardown() {
-#     # : # rm -f /tmp/bats-tutorial-project-ran
-#     :
-# }

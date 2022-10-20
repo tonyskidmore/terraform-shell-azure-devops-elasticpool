@@ -263,14 +263,15 @@ check_prereqs() {
   do
     if ! check_command "$cmd"
     then
-      # raise "Module prerequisite not installed: $cmd"
+      raise "Module prerequisite not installed: $cmd"
       exit 6
     fi
   done
 }
 
-# TODO: if this supplys bad command ends up in broken loop
+
 prereqs() {
+  # TODO: set defaults and allow to test for failures
   cmds=("jq" "curl" "cat" "sed")
   check_prereqs "${cmds[@]}"
 }
@@ -370,7 +371,7 @@ checkout() {
       [[ $url =~ $regex ]] && service="${BASH_REMATCH[1]}"
       printf "Operation successful. Service: %s, Mode: %s, Method: %s, exit_code: %s, HTTP code: %s\n" "$service" "$mode" "$method" "$exit_code" "$http_code"
     else
-      if [[ "$(echo "$out" | jq empty > /dev/null 2>&1; echo $?)" = "0" ]]
+      if [[ -n "$out" ]] && [[ "$(echo "$out" | jq empty > /dev/null 2>&1; echo $?)" = "0" ]]
       then
         printf "Parsed JSON successfully and got something other than false/null\n"
         message="$(echo "$out" | jq -r '.message')"
@@ -386,6 +387,10 @@ checkout() {
         then
           raise "The resource cannot be found"
           exit 5
+        elif [[ "$http_code" == "401" ]]
+        then
+          raise "401 Unauthorized, probable PAT permissions issue"
+          exit 7
         else
         raise "Unknown error"
           printf "%s\n" "$out"
