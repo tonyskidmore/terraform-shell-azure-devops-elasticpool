@@ -8,6 +8,6 @@ pool:
 steps:
 - task: DevcontainersCI@0
   inputs:
-    imageName: 'yourregistry.azurecr.io/example-dev-container'
-    runCmd: 'make ci-build'
+    # Change this to be your CI task/script
+    runCmd: 'make unit_tests'
     sourceBranchFilterForPush: refs/heads/refactor-shell
