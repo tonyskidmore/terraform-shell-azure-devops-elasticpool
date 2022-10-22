@@ -9,5 +9,6 @@ steps:
 - task: DevcontainersCI@0
   inputs:
     # Change this to be your CI task/script
-    runCmd: 'make unit_tests'
+    runCmd: 'make test_unit'
     sourceBranchFilterForPush: refs/heads/refactor-shell
+  displayName: "make test_unit"
