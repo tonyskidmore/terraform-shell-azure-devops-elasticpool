@@ -8,6 +8,7 @@
 | Name | Version |
 |------|---------|
 | terraform | >= 1.0.0 |
+| azurerm | >=3.1.0 |
 | shell | ~>1.7.10 |
 ## Providers
 
@@ -26,7 +27,7 @@
 | ado\_ext\_pat | Azure DevOps Personal Access Token | `string` | n/a | yes |
 | ado\_org | Azure DevOps organization | `string` | `"https://dev.azure.com/tonyskidmore"` | no |
 | ado\_pool\_desired\_idle | Desired idle instances | `number` | `0` | no |
-| ado\_pool\_name | Name of the Vnet that the target subnet is a member of | `string` | `"vnet-azdo-agents-01"` | no |
+| ado\_pool\_name | Name of the Vnet that the target subnet is a member of | `string` | `"vmss-agent-pool-linux-001"` | no |
 | ado\_project | Azure DevOps organization | `string` | `"ve-vmss"` | no |
 | ado\_service\_connection | Azure DevOps organiservice connection name | `string` | `"ve-vmss"` | no |
 | vmss\_name | Azure Virtual Machine Scale Set name | `string` | `"vmss-agent-pool-linux-001"` | no |

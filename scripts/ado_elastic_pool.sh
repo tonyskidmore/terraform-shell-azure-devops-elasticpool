@@ -7,9 +7,15 @@ main () {
   "${mode}_func"
 }
 
+echo "PWD: $PWD"
+script_dir="$(dirname "$(realpath "$0")")"
+echo "script_dir: $script_dir"
+functions="$script_dir/functions.sh"
+echo "functions: $functions"
+
 # shellcheck source=./scripts/functions.sh
 # shellcheck disable=SC1091
-source ./scripts/functions.sh
+source "$script_dir/functions.sh"
 
 # similar method in bash to the Python:
 # if __name__ == "__main__":

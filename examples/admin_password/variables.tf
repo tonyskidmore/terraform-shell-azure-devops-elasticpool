@@ -36,7 +36,7 @@ variable "ado_service_connection" {
 variable "ado_pool_name" {
   type        = string
   description = "Name of the Vnet that the target subnet is a member of"
-  default     = "vnet-azdo-agents-01"
+  default     = "vmss-agent-pool-linux-001"
 }
 
 variable "ado_pool_desired_idle" {
