@@ -1,25 +1,37 @@
-# Overview
+# terraform-shell-azure-devops-elasticpool
 
+[![GitHub Super-Linter](https://github.com/tonyskidmore/terraform-shell-azure-devops-elasticpool/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
 
+Azure DevOps Scale Set Elasticpool Terraform module.
+
+Due to the fact that creating an [Agent Pool - Azure virtual machine scale set][scale-agents] is currently [blocked][blocking-issue]
+due to not being supported by the SDK used by the [Azure DevOps Terraform Provider][terraform-provider-azuredevops],
+this module use the [Terraform shell provider][shell-provider] as a workaround.
 
 <!-- BEGIN_TF_DOCS -->
-## Requirements
 
-| Name | Version |
-|------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13.0 |
-| <a name="requirement_shell"></a> [shell](#requirement\_shell) | ~>1.7.10 |
 
-## Providers
 
-| Name | Version |
-|------|---------|
-| <a name="provider_shell"></a> [shell](#provider\_shell) | 1.7.10 |
+## Basic example
 
-## Modules
+```hcl
 
-No modules.
+data "azurerm_subnet" "agents" {
+  name                 = var.vmss_subnet_name
+  virtual_network_name = var.vmss_vnet_name
+  resource_group_name  = var.vmss_vnet_resource_group_name
+}
 
+module "vmss" {
+  source                   = "tonyskidmore/vmss/azurerm"
+  version                  = "0.1.0"
+  vmss_name                = var.vmss_name
+  vmss_resource_group_name = var.vmss_resource_group_name
+  vmss_subnet_id           = data.azurerm_subnet.agents.id
+  vmss_admin_password      = var.vmss_admin_password
+}
+
+```
 ## Resources
 
 | Name | Type |
@@ -53,26 +65,17 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_ado_vmss_pool_output"></a> [ado\_vmss\_pool\_output](#output\_ado\_vmss\_pool\_output) | Azure DevOps VMSS Agent Pool output |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_shell"></a> [shell](#provider\_shell) | 1.7.10 |
+
+
 <!-- END_TF_DOCS -->
 
-## Debuging
-
-````bash
-
-export TF_LOG=TRACE
-export TF_LOG_PATH="./trace.log"
-
-````
-
-`[DEBUG] Starting execution...`
-
-## Development
-
-[Developing inside a Container](https://code.visualstudio.com/docs/remote/containers)
-
-````bash
-
-pre-commit install
-pre-commit install-hooks
-
-````
+[scale-agents]: https://learn.microsoft.com/en-us/azure/devops/pipelines/agents/scale-set-agents
+[shell-provider]: https://registry.terraform.io/providers/scottwinkler/shell/1.7.10
+[blocking-issue]: https://github.com/microsoft/terraform-provider-azuredevops/issues/204
+[terraform-provider-azuredevops]: https://github.com/microsoft/terraform-provider-azuredevops

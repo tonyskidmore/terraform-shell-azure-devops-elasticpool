@@ -71,9 +71,11 @@
 
 	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode",
+	// .pre-commit-<uuid> creates a unique cache directory in $HOME/.pre-commit for each project
+	// specify a new uuid per project e.g. using uuidgen
 	"mounts": [
-		"source=${localEnv:HOME}${localEnv:USERPROFILE}/.pre-commit,target=/home/vscode/.pre-commit,type=bind,consistency=cached",
-		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached",
+		"source=${localEnv:HOME}/.pre-commit-9d066d7c-630e-4d1e-9925-29798c37eb85,target=/home/vscode/.pre-commit,type=bind,consistency=cached",
+		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
 	],
 	"remoteEnv": {
 		"PRE_COMMIT_HOME": "/home/vscode/.pre-commit"
