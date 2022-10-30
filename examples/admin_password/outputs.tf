@@ -1,4 +1,4 @@
-output "vmss_id" {
-  value       = module.vmss.vmss_id
-  description = "Virtual Machine Scale Set ID"
+output "ado_vmss_pool_output" {
+  value       = module.terraform-azurerm-vmss-devops-agent.ado_vmss_pool_output
+  description = "Azure DevOps Elasticpool output"
 }

@@ -1,8 +1,5 @@
-# Azure Virtual Machine Scale Set
+# Azure DevOps Self-Hosted Elasticpool Agent
 
-Example of creating an Azure VMSS with instances configured with an
-administrator password as opposed to an SSH key pair
-(SSH key pair is recommended).
 
 <!-- BEGIN_TF_DOCS -->
 
@@ -11,7 +8,7 @@ administrator password as opposed to an SSH key pair
 | Name | Version |
 |------|---------|
 | terraform | >= 1.0.0 |
-| azurerm | >=3.1.0 |
+| shell | ~>1.7.10 |
 ## Providers
 
 | Name | Version |
@@ -21,39 +18,45 @@ administrator password as opposed to an SSH key pair
 
 | Name | Source | Version |
 |------|--------|---------|
-| vmss | tonyskidmore/vmss/azurerm | 0.1.0 |
+| terraform-azurerm-vmss-devops-agent | ../../ | n/a |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| vmss\_admin\_password | Password to allocate to the admin user account | `string` | `"Sup3rS3cr3tP@55w0rd!"` | no |
-| vmss\_name | Name of the Virtual Machine Scale Set to create | `string` | `"vmss-agent-pool-linux-001"` | no |
-| vmss\_resource\_group\_name | Existing resource group name of where the VMSS will be created | `string` | `"rg-vmss-azdo-agents-01"` | no |
-| vmss\_subnet\_name | Name of subnet where the vmss will be connected | `string` | `"snet-azdo-agents-01"` | no |
-| vmss\_vnet\_name | Name of the Vnet that the target subnet is a member of | `string` | `"vnet-azdo-agents-01"` | no |
-| vmss\_vnet\_resource\_group\_name | Existing resource group where the Vnet containing the subnet is located | `string` | `"rg-azdo-agents-networks-01"` | no |
+| ado\_ext\_pat | Azure DevOps Personal Access Token | `string` | n/a | yes |
+| ado\_org | Azure DevOps organization | `string` | `"https://dev.azure.com/tonyskidmore"` | no |
+| ado\_pool\_desired\_idle | Desired idle instances | `number` | `0` | no |
+| ado\_pool\_name | Name of the Vnet that the target subnet is a member of | `string` | `"vnet-azdo-agents-01"` | no |
+| ado\_project | Azure DevOps organization | `string` | `"ve-vmss"` | no |
+| ado\_service\_connection | Azure DevOps organiservice connection name | `string` | `"ve-vmss"` | no |
+| vmss\_name | Azure Virtual Machine Scale Set name | `string` | `"vmss-agent-pool-linux-001"` | no |
+| vmss\_resource\_group\_name | Azure VMSS resource group name | `string` | `"rg-vmss-azdo-agents-01"` | no |
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| vmss\_id | Virtual Machine Scale Set ID |
+| ado\_vmss\_pool\_output | Azure DevOps Elasticpool output |
 
 Example
 
 ```hcl
-data "azurerm_subnet" "agents" {
-  name                 = var.vmss_subnet_name
-  virtual_network_name = var.vmss_vnet_name
-  resource_group_name  = var.vmss_vnet_resource_group_name
+
+data "azurerm_virtual_machine_scale_set" "ado_pool" {
+  name                = var.vmss_name
+  resource_group_name = var.vmss_resource_group_name
 }
 
-module "vmss" {
-  source                   = "tonyskidmore/vmss/azurerm"
-  version                  = "0.1.0"
-  vmss_name                = var.vmss_name
-  vmss_resource_group_name = var.vmss_resource_group_name
-  vmss_subnet_id           = data.azurerm_subnet.agents.id
-  vmss_admin_password      = var.vmss_admin_password
+module "terraform-azurerm-vmss-devops-agent" {
+  source = "../../"
+  # this will be supplied by exporting TF_VAR_ado_ext_pat before running terraform
+  # this an Azure DevOps Personal Access Token to create and manage the agent pool
+  ado_ext_pat            = var.ado_ext_pat
+  ado_org                = var.ado_org
+  ado_project            = var.ado_project
+  ado_service_connection = var.ado_service_connection
+  ado_pool_name          = var.ado_pool_name
+  ado_pool_desired_idle  = 0
+  ado_vmss_id            = data.azurerm_virtual_machine_scale_set.ado_pool.id
 }
 ```
 <!-- END_TF_DOCS -->

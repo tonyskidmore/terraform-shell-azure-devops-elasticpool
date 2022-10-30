@@ -1,35 +1,46 @@
 variable "vmss_name" {
   type        = string
-  description = "Name of the Virtual Machine Scale Set to create"
+  description = "Azure Virtual Machine Scale Set name"
   default     = "vmss-agent-pool-linux-001"
 }
 
 variable "vmss_resource_group_name" {
   type        = string
-  description = "Existing resource group name of where the VMSS will be created"
+  description = "Azure VMSS resource group name"
   default     = "rg-vmss-azdo-agents-01"
 }
 
-variable "vmss_vnet_resource_group_name" {
+variable "ado_ext_pat" {
   type        = string
-  description = "Existing resource group where the Vnet containing the subnet is located"
-  default     = "rg-azdo-agents-networks-01"
+  description = "Azure DevOps Personal Access Token"
 }
 
-variable "vmss_subnet_name" {
+variable "ado_org" {
   type        = string
-  description = "Name of subnet where the vmss will be connected"
-  default     = "snet-azdo-agents-01"
+  description = "Azure DevOps organization"
+  default     = "https://dev.azure.com/tonyskidmore"
 }
 
-variable "vmss_vnet_name" {
+variable "ado_project" {
+  type        = string
+  description = "Azure DevOps organization"
+  default     = "ve-vmss"
+}
+
+variable "ado_service_connection" {
+  type        = string
+  description = "Azure DevOps organiservice connection name"
+  default     = "ve-vmss"
+}
+
+variable "ado_pool_name" {
   type        = string
   description = "Name of the Vnet that the target subnet is a member of"
   default     = "vnet-azdo-agents-01"
 }
 
-variable "vmss_admin_password" {
-  type        = string
-  description = "Password to allocate to the admin user account"
-  default     = "Sup3rS3cr3tP@55w0rd!"
+variable "ado_pool_desired_idle" {
+  type        = number
+  description = "Desired idle instances"
+  default     = 0
 }
