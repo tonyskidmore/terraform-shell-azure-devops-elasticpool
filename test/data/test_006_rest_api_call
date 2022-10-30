@@ -1,0 +1,10 @@
+{
+  "$id": "1",
+  "innerException": null,
+  "message": "Elastic pool not found with pool id 276",
+  "typeName": "Microsoft.TeamFoundation.DistributedTask.WebApi.ElasticPoolDoesNotExistException, Microsoft.TeamFoundation.DistributedTask.WebApi",
+  "typeKey": "ElasticPoolDoesNotExistException",
+  "errorCode": 0,
+  "eventId": 3000
+}
+404

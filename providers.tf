@@ -6,10 +6,11 @@ terraform {
     }
   }
 
-  required_version = ">= 0.13.0"
+  required_version = ">= 1.0.0"
 }
 
 provider "shell" {
+  # interpreter = ["/bin/bash"]
   sensitive_environment = {
     AZURE_DEVOPS_EXT_PAT = var.ado_ext_pat
   }

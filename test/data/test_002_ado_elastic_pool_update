@@ -1,0 +1,2 @@
+{"poolId":275,"serviceEndpointId":"9e472165-b56d-4b28-a1ff-6d6c415d6ad3","serviceEndpointScope":"290659e0-6f38-49da-8f20-a29070687d7c","azureId":"/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-vmss-azdo-agents-01/providers/Microsoft.Compute/virtualMachineScaleSets/vmss-portal-test-001","maxCapacity":2,"desiredIdle":0,"recycleAfterEachUse":false,"maxSavedNodeCount":0,"osType":"linux","state":"online","offlineSince":null,"desiredSize":0,"sizingAttempts":0,"agentInteractiveUI":false,"timeToLiveMinutes":45}
+200
