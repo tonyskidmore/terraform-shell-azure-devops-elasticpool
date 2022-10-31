@@ -1,7 +1,8 @@
 ---
 
-# permissions:
-#   statuses: write
+permissions:
+  statuses: write
+  contents: read
 
 name: Lint Code Base
 
