@@ -41,10 +41,9 @@ data "azurerm_virtual_machine_scale_set" "ado_pool" {
   resource_group_name = var.vmss_resource_group_name
 }
 
-module "terraform-shell-azure-devops-elasticpool" {
-  # source  = "tonyskidmore/azure-devops-elasticpool/shell"
-  # version = "0.1.0"
-  source = "../../"
+module "azure-devops-elasticpool" {
+  source  = "tonyskidmore/azure-devops-elasticpool/shell"
+  version = "0.1.0"
   # this will be supplied by exporting TF_VAR_ado_ext_pat before running terraform
   # this an Azure DevOps Personal Access Token to create and manage the agent pool
   ado_ext_pat            = var.ado_ext_pat
@@ -99,6 +98,19 @@ module "terraform-shell-azure-devops-elasticpool" {
 
 
 <!-- END_TF_DOCS -->
+
+## Troubleshooting
+
+If an error occurs when running the module and the error is not immediately obvious then enabling a trace log prior to running the module can help to troubleshoot:
+
+````bash
+
+export TF_LOG=TRACE
+export TF_LOG_PATH="./trace.log"
+
+````
+
+After enabling the trace log and recreating the issue look in the `trace.log` file and search for `[DEBUG] Starting execution...`.  Hopefully the additional output will provide additional information to help determine the underlying cause.
 
 [scale-agents]: https://learn.microsoft.com/en-us/azure/devops/pipelines/agents/scale-set-agents
 [shell-provider]: https://registry.terraform.io/providers/scottwinkler/shell/1.7.10
