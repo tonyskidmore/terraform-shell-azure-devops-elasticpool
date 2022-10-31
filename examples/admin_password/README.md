@@ -19,7 +19,7 @@
 
 | Name | Source | Version |
 |------|--------|---------|
-| terraform-azurerm-vmss-devops-agent | ../../ | n/a |
+| terraform-shell-azure-devops-elasticpool | ../../ | n/a |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -47,7 +47,9 @@ data "azurerm_virtual_machine_scale_set" "ado_pool" {
   resource_group_name = var.vmss_resource_group_name
 }
 
-module "terraform-azurerm-vmss-devops-agent" {
+module "terraform-shell-azure-devops-elasticpool" {
+  # source  = "tonyskidmore/azure-devops-elasticpool/shell"
+  # version = "0.1.0"
   source = "../../"
   # this will be supplied by exporting TF_VAR_ado_ext_pat before running terraform
   # this an Azure DevOps Personal Access Token to create and manage the agent pool
