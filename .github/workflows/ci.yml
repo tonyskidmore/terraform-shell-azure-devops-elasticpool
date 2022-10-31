@@ -1,7 +1,7 @@
 ---
 
-# permissions:
-#   statuses: write
+permissions:
+  statuses: write
 
 name: Lint Code Base
 
