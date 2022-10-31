@@ -2,11 +2,30 @@
 
 [![GitHub Super-Linter](https://github.com/tonyskidmore/terraform-shell-azure-devops-elasticpool/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
 
-Azure DevOps Scale Set Elasticpool Terraform module.
+Azure DevOps VM Scale Set Elasticpool Terraform module.
 
 Due to the fact that creating an [Agent Pool - Azure virtual machine scale set][scale-agents] is currently [blocked][blocking-issue]
 due to not being supported by the SDK used by the [Azure DevOps Terraform Provider][terraform-provider-azuredevops],
-this module use the [Terraform shell provider][shell-provider] as a workaround.
+this module uses the [Terraform shell provider][shell-provider] as a workaround.
+
+## Requirements
+
+* A Linux based system is required to execute this Terraform module, with the following commands installed:
+  - cat
+  - curl
+  - sed
+  - jq
+
+* An Azure DevOps [Personal Access Token][azdo-pat](PAT) created with at least Agent Pools (Read & manage) and Service Connections (Read & query) permissions.
+
+The PAT needs be passed to the Terraform configuration by any standard mechanism, for example:
+
+````bash
+
+ export AZURE_DEVOPS_EXT_PAT="ckusfcc8ope2soot1yuovmdvlgtfgj9nio2orfwyvv5jsgcnwwga"
+export TF_VAR_ado_ext_pat="$AZURE_DEVOPS_EXT_PAT"
+
+````
 
 <!-- BEGIN_TF_DOCS -->
 
@@ -22,7 +41,9 @@ data "azurerm_virtual_machine_scale_set" "ado_pool" {
   resource_group_name = var.vmss_resource_group_name
 }
 
-module "terraform-azurerm-vmss-devops-agent" {
+module "terraform-shell-azure-devops-elasticpool" {
+  # source  = "tonyskidmore/azure-devops-elasticpool/shell"
+  # version = "0.1.0"
   source = "../../"
   # this will be supplied by exporting TF_VAR_ado_ext_pat before running terraform
   # this an Azure DevOps Personal Access Token to create and manage the agent pool
@@ -83,3 +104,4 @@ module "terraform-azurerm-vmss-devops-agent" {
 [shell-provider]: https://registry.terraform.io/providers/scottwinkler/shell/1.7.10
 [blocking-issue]: https://github.com/microsoft/terraform-provider-azuredevops/issues/204
 [terraform-provider-azuredevops]: https://github.com/microsoft/terraform-provider-azuredevops
+[azdo-pat]: https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate
