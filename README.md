@@ -100,6 +100,19 @@ module "terraform-shell-azure-devops-elasticpool" {
 
 <!-- END_TF_DOCS -->
 
+## Troubleshooting
+
+If an error occurs when running the module and the error is not immediately obvious then enabling a trace log prior to running the module can help to troubleshoot:
+
+````bash
+
+export TF_LOG=TRACE
+export TF_LOG_PATH="./trace.log"
+
+````
+
+After enabling the trace log and recreating the issue look in the `trace.log` file and search for `[DEBUG] Starting execution...`.  Hopefully the additional output will provide additional information to help determine the underlying cause.
+
 [scale-agents]: https://learn.microsoft.com/en-us/azure/devops/pipelines/agents/scale-set-agents
 [shell-provider]: https://registry.terraform.io/providers/scottwinkler/shell/1.7.10
 [blocking-issue]: https://github.com/microsoft/terraform-provider-azuredevops/issues/204
