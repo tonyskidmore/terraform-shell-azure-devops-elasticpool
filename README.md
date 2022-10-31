@@ -41,7 +41,7 @@ data "azurerm_virtual_machine_scale_set" "ado_pool" {
   resource_group_name = var.vmss_resource_group_name
 }
 
-module "terraform-shell-azure-devops-elasticpool" {
+module "azure-devops-elasticpool" {
   source  = "tonyskidmore/azure-devops-elasticpool/shell"
   version = "0.1.0"
   # this will be supplied by exporting TF_VAR_ado_ext_pat before running terraform
