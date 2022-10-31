@@ -34,7 +34,7 @@ variable "ado_project_only" {
 
   validation {
     condition     = contains(["True", "False"], var.ado_project_only)
-    error_message = "ado_project_only must be True or False."
+    error_message = "The ado_project_only variable must be True or False."
   }
 }
 
@@ -57,7 +57,7 @@ variable "ado_pool_os_type" {
 
   validation {
     condition     = contains(["linux", "windows"], var.ado_pool_os_type)
-    error_message = "ado_pool_os_type must be linux or windows."
+    error_message = "The ado_pool_os_type variable must be linux or windows."
   }
 }
 
@@ -104,7 +104,7 @@ variable "ado_pool_auth_all_pipelines" {
 
   validation {
     condition     = contains(["True", "False"], var.ado_pool_auth_all_pipelines)
-    error_message = "ado_pool_auth_all_pipelines must be True or False."
+    error_message = "The ado_pool_auth_all_pipelines variable must be True or False."
   }
 }
 
@@ -115,6 +115,6 @@ variable "ado_pool_auto_provision_projects" {
 
   validation {
     condition     = contains(["True", "False"], var.ado_pool_auto_provision_projects)
-    error_message = "ado_pool_auto_provision_projects must be True or False."
+    error_message = "The ado_pool_auto_provision_projects variable must be True or False."
   }
 }

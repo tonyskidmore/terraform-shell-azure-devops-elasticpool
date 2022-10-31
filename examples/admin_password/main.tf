@@ -13,6 +13,6 @@ module "terraform-azurerm-vmss-devops-agent" {
   ado_project            = var.ado_project
   ado_service_connection = var.ado_service_connection
   ado_pool_name          = var.ado_pool_name
-  ado_pool_desired_idle  = 0
+  ado_pool_desired_idle  = var.ado_pool_desired_idle
   ado_vmss_id            = data.azurerm_virtual_machine_scale_set.ado_pool.id
 }

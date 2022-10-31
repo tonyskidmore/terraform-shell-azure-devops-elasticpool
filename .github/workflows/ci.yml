@@ -2,6 +2,7 @@
 
 permissions:
   statuses: write
+  contents: read
 
 name: Lint Code Base
 
@@ -28,6 +29,7 @@ jobs:
           # Full git history is needed to get a proper list
           # of changed files within `super-linter`
           fetch-depth: 0
+          submodules: 'recursive'
 
         # https://github.com/marketplace/actions/super-linter
       - name: Lint Code Base
@@ -49,6 +51,7 @@ jobs:
           # Full git history is needed to get a proper list
           # of changed files within `super-linter`
           fetch-depth: 0
+          submodules: 'recursive'
 
       - name: Setup Python
         uses: actions/setup-python@v4
