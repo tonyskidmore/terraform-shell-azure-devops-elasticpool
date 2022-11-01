@@ -16,6 +16,9 @@ this module uses the [Terraform shell provider][shell-provider] as a workaround.
 * An [Azure DevOps][azdo] [Organization][azdo-org].
   _Note:_ you can sign up for free in the preceding link.
 
+* An Azure Virtual Machine Scale Set.
+  _Note_: a test can can be created by using the [terraform-azurerm-vmss example][tf-vmss-example]
+
 * An [Azure][azdo-connect-azure] service connection to the subscription where your Azure Virtual Machine Scale Set is located.
 
 * An [Azure DevOps][azdo-project] project.
@@ -134,3 +137,4 @@ After enabling the trace log and recreating the issue look in the `trace.log` fi
 [azdo-org]: https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization
 [azdo-project]: https://learn.microsoft.com/en-us/azure/devops/organizations/projects/create-project
 [azdo-connect-azure]: https://learn.microsoft.com/en-us/azure/devops/pipelines/library/connect-to-azure
+[tf-vmss-example]: https://github.com/tonyskidmore/terraform-azurerm-vmss/tree/main/examples/admin_password
