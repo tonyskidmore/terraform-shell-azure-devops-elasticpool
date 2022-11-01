@@ -10,13 +10,23 @@ this module uses the [Terraform shell provider][shell-provider] as a workaround.
 
 ## Requirements
 
+* An Azure subscription.
+  _Note:_ you can get started with a [Azure free account][azure-free]
+
+* An [Azure DevOps][azdo] [Organization][azdo-org].
+  _Note:_ you can sign up for free in the preceding link.
+
+* An [Azure][azdo-connect-azure] service connection to the subscription where your Azure Virtual Machine Scale Set is located.
+
+* An [Azure DevOps][azdo-project] project.
+
+* An Azure DevOps [Personal Access Token][azdo-pat](PAT) created with at least Agent Pools (Read & manage) and Service Connections (Read & query) permissions.
+
 * A Linux based system is required to execute this Terraform module, with the following commands installed:
   - cat
   - curl
   - sed
   - jq
-
-* An Azure DevOps [Personal Access Token][azdo-pat](PAT) created with at least Agent Pools (Read & manage) and Service Connections (Read & query) permissions.
 
 The PAT needs be passed to the Terraform configuration by any standard mechanism, for example:
 
@@ -26,6 +36,8 @@ The PAT needs be passed to the Terraform configuration by any standard mechanism
 export TF_VAR_ado_ext_pat="$AZURE_DEVOPS_EXT_PAT"
 
 ````
+
+_Note:_ The PAT is used for the initial creation of the agent pool and for subsequent Terraform operations.  Therefore, it would be advisable to create/use a service account for this rather than a standard user account.
 
 <!-- BEGIN_TF_DOCS -->
 
@@ -117,3 +129,8 @@ After enabling the trace log and recreating the issue look in the `trace.log` fi
 [blocking-issue]: https://github.com/microsoft/terraform-provider-azuredevops/issues/204
 [terraform-provider-azuredevops]: https://github.com/microsoft/terraform-provider-azuredevops
 [azdo-pat]: https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate
+[azure-free]: https://azure.microsoft.com/en-gb/free
+[azdo]: https://azure.microsoft.com/en-gb/products/devops
+[azdo-org]: https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization
+[azdo-project]: https://learn.microsoft.com/en-us/azure/devops/organizations/projects/create-project
+[azdo-connect-azure]: https://learn.microsoft.com/en-us/azure/devops/pipelines/library/connect-to-azure
