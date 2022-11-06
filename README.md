@@ -50,6 +50,15 @@ _Note:_ The PAT is used for the initial creation of the agent pool and for subse
 
 ```hcl
 
+provider "azurerm" {
+  features {}
+}
+
+provider "shell" {
+  sensitive_environment = {
+    AZURE_DEVOPS_EXT_PAT = var.ado_ext_pat
+  }
+}
 
 data "azurerm_virtual_machine_scale_set" "ado_pool" {
   name                = var.vmss_name
@@ -58,7 +67,7 @@ data "azurerm_virtual_machine_scale_set" "ado_pool" {
 
 module "azure-devops-elasticpool" {
   source  = "tonyskidmore/azure-devops-elasticpool/shell"
-  version = "0.1.0"
+  version = "0.2.0"
   # this will be supplied by exporting TF_VAR_ado_ext_pat before running terraform
   # this an Azure DevOps Personal Access Token to create and manage the agent pool
   ado_ext_pat            = var.ado_ext_pat

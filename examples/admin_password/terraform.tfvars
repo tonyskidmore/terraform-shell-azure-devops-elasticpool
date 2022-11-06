@@ -1,0 +1,6 @@
+vmss_name                = "vmss-agent-pool-linux-001"
+vmss_resource_group_name = "rg-tests-terraform-azurerm-vmss"
+ado_org                  = "https://dev.azure.com/tonyskidmore"
+ado_project              = "ve-vmss"
+ado_service_connection   = "ve-vmss"
+ado_pool_name            = "vmss-agent-pool-linux-001"

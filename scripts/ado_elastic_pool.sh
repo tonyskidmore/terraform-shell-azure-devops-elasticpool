@@ -7,7 +7,7 @@ main () {
   "${mode}_func"
 }
 
-# different source paths when runningg bats tests
+# different source paths when running bats tests
 if [[ -z "$BATS_TEST_FILENAME" ]]
 then
   script_dir="$(dirname "$(realpath "$0")")"

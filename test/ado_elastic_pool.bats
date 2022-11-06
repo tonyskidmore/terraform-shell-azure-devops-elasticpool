@@ -3,6 +3,10 @@ setup() {
   _common_setup
 }
 
+teardown() {
+    rm -rf "/tmp/$BATS_TEST_TMPDIR"
+}
+
 # these tests are for end-to-end main script functionality
 
 @test "successScriptPrerequisites" {
@@ -121,10 +125,11 @@ setup() {
 
 @test "failureUpdateNoEnvVars" {
   # negative test for environment variables not set
+  export AZURE_DEVOPS_EXT_PAT="dummypat"
   run ado_elastic_pool.sh update
   assert_failure 1
   assert_output --partial "ADO_ORG must be set before executing this script"
-  assert_output --partial "AZURE_DEVOPS_EXT_PAT must be set before executing this script"
+  assert_output --partial "ADO_PROJECT must be set before executing this script"
 }
 
 @test "failureCreateElasticpoolUnauth" {
