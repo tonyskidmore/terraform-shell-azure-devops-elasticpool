@@ -44,7 +44,7 @@ repos:
           name: Unit tests
           entry: test/bats/bin/bats
           args:
-            ["-p", "test/"]
+            ["-t", "test/"]
           language: system
           pass_filenames: false
 
