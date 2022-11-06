@@ -103,21 +103,7 @@ input_state() {
   project_id=$(echo "$std_in" | jq -r '.serviceEndpointScope')
 }
 
-# TODO: test this
-# out='{
-#   "agentInteractiveUI": false,
-#   "azureId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-vmss-azdo-agents-01/providers/Microsoft.Compute/virtualMachineScaleSets/vmss-portal-test-001",
-#   "desiredIdle": 0,
-#   "maxCapacity": 2,
-#   "maxSavedNodeCount": 0,
-#   "osType": "linux",
-#   "recycleAfterEachUse": false,
-#   "serviceEndpointId": "290659e0-6f38-49da-8f20-a29070687d7c",
-#   "serviceEndpointScope": "9e472165-b56d-4b28-a1ff-6d6c415d6ad3",
-#   "timeToLiveMinutes": 30,
-#   "offlineSince": "yesterday",
-#   "state": "online"
-# }'
+
 # output_state
 output_state() {
   # save state from stdout
@@ -271,7 +257,6 @@ check_prereqs() {
 
 
 prereqs() {
-  # TODO: set defaults and allow to test for failures
   cmds=("jq" "curl" "cat" "sed")
   check_prereqs "${cmds[@]}"
 }

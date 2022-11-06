@@ -3,6 +3,10 @@ setup() {
   _common_setup
 }
 
+teardown() {
+    rm -rf "/tmp/$BATS_TEST_TMPDIR"
+}
+
 # the tests for the rest_api_call function use pre-created curl output
 # so are mainly targeted at confirming the checkout function behaves as expected
 # and the various expected curl results

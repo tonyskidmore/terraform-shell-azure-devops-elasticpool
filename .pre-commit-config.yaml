@@ -36,7 +36,17 @@ repos:
   -   repo: https://github.com/koalaman/shellcheck-precommit
       rev: v0.8.0
       hooks:
-      -   id: shellcheck
+        - id: shellcheck
+
+  -   repo: local
+      hooks:
+        - id: unit-test
+          name: Unit tests
+          entry: test/bats/bin/bats
+          args:
+            ["-t", "test/"]
+          language: system
+          pass_filenames: false
 
   - repo: local
     hooks:
@@ -45,11 +55,6 @@ repos:
         entry: pylint
         language: system
         types: [python]
-        args:
-          [
-            # "-rn", # Only display messages
-            # "-sn", # Don't display the score
-          ]
 
   -   repo: https://github.com/PyCQA/flake8
       rev: 4.0.1
