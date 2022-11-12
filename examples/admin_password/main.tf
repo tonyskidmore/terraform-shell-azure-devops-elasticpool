@@ -16,7 +16,6 @@ data "azurerm_virtual_machine_scale_set" "ado_pool" {
 module "azure-devops-elasticpool" {
   source                 = "tonyskidmore/azure-devops-elasticpool/shell"
   version                = "0.3.0"
-  ado_ext_pat            = var.ado_ext_pat
   ado_org                = var.ado_org
   ado_project            = var.ado_project
   ado_service_connection = var.ado_service_connection
