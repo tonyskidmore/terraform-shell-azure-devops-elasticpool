@@ -1,8 +1,4 @@
 # required variables
-variable "ado_ext_pat" {
-  type        = string
-  description = "Azure DevOps personal access token"
-}
 
 variable "ado_org" {
   type        = string

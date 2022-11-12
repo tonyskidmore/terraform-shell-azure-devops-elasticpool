@@ -66,10 +66,8 @@ data "azurerm_virtual_machine_scale_set" "ado_pool" {
 }
 
 module "azure-devops-elasticpool" {
-  source  = "tonyskidmore/azure-devops-elasticpool/shell"
-  version = "0.2.0"
-  # this will be supplied by exporting TF_VAR_ado_ext_pat before running terraform
-  # this an Azure DevOps Personal Access Token to create and manage the agent pool
+  source                 = "tonyskidmore/azure-devops-elasticpool/shell"
+  version                = "0.3.0"
   ado_ext_pat            = var.ado_ext_pat
   ado_org                = var.ado_org
   ado_project            = var.ado_project
@@ -90,7 +88,6 @@ module "azure-devops-elasticpool" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_ado_ext_pat"></a> [ado\_ext\_pat](#input\_ado\_ext\_pat) | Azure DevOps personal access token | `string` | n/a | yes |
 | <a name="input_ado_org"></a> [ado\_org](#input\_ado\_org) | Azure DevOps Organization name | `string` | n/a | yes |
 | <a name="input_ado_pool_auth_all_pipelines"></a> [ado\_pool\_auth\_all\_pipelines](#input\_ado\_pool\_auth\_all\_pipelines) | Setting to determine if all pipelines are authorized to use this TaskAgentPool by default (at create only) | `string` | `"True"` | no |
 | <a name="input_ado_pool_auto_provision_projects"></a> [ado\_pool\_auto\_provision\_projects](#input\_ado\_pool\_auto\_provision\_projects) | Setting to automatically provision TaskAgentQueues in every project for the new pool (at create only) | `string` | `"True"` | no |
