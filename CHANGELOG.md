@@ -3,7 +3,7 @@
 [keepachangelog](https://keepachangelog.com/en/1.0.0/)
 
 ## [0.3.0]
- * Fixing [#8](https://github.com/tonyskidmore/terraform-shell-azure-devops-elasticpool/issues/8)
+* Fixing [#8](https://github.com/tonyskidmore/terraform-shell-azure-devops-elasticpool/issues/8)
 
 ## [0.2.0]
 * Moved provider block
