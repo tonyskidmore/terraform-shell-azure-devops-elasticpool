@@ -67,7 +67,7 @@ data "azurerm_virtual_machine_scale_set" "ado_pool" {
 
 module "azure-devops-elasticpool" {
   source                 = "tonyskidmore/azure-devops-elasticpool/shell"
-  version                = "0.3.0"
+  version                = "0.4.0"
   ado_org                = var.ado_org
   ado_project            = var.ado_project
   ado_service_connection = var.ado_service_connection
@@ -103,6 +103,11 @@ module "azure-devops-elasticpool" {
 | <a name="input_ado_project_only"></a> [ado\_project\_only](#input\_ado\_project\_only) | Only create the agent pool in the Azure DevOps pool specified? (at create only) | `string` | `"False"` | no |
 | <a name="input_ado_service_connection"></a> [ado\_service\_connection](#input\_ado\_service\_connection) | Azure DevOps azure service connection name | `string` | n/a | yes |
 | <a name="input_ado_vmss_id"></a> [ado\_vmss\_id](#input\_ado\_vmss\_id) | Azure Virtual Machine Scale Set Resource ID if not created by the module | `string` | `""` | no |
+| <a name="input_http_connect_timeout"></a> [http\_connect\_timeout](#input\_http\_connect\_timeout) | The maximum time in seconds before timing out a connection to the Azure DevOps REST API | `number` | `20` | no |
+| <a name="input_http_max_time"></a> [http\_max\_time](#input\_http\_max\_time) | The maximum amount of time in seconds for an Azure DevOps REST API operation to complete | `number` | `120` | no |
+| <a name="input_http_retries"></a> [http\_retries](#input\_http\_retries) | The number of retries make to the Azure DevOps REST API | `number` | `10` | no |
+| <a name="input_http_retries_max_time"></a> [http\_retries\_max\_time](#input\_http\_retries\_max\_time) | The maximum time in seconds for the retry period for a connection to the Azure DevOps REST API | `number` | `120` | no |
+| <a name="input_http_retry_delay"></a> [http\_retry\_delay](#input\_http\_retry\_delay) | The maximum time in seconds to delay before retrying a connection to the Azure DevOps REST API | `number` | `3` | no |
 
 ## Outputs
 
