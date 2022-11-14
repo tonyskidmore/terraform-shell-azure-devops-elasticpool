@@ -270,8 +270,11 @@ build_params() {
   params=(
           "--silent" \
           "--show-error" \
-          "--max-time" "20" \
-          "--connect-timeout" "20" \
+          "--retry" "$HTTP_RETRIES" \
+          "--retry-delay" "$HTTP_RETRY_DELAY" \
+          "--retry-max-time" "$HTTP_RETRIES_MAX_TIME"
+          "--max-time" "$HTTP_MAX_TIME" \
+          "--connect-timeout" "$HTTP_CONNECT_TIMEOUT" \
           "--write-out" "\n%{http_code}" \
           "--header" "Content-Type: application/json" \
           "--request" "$method"

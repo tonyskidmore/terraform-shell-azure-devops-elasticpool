@@ -114,3 +114,33 @@ variable "ado_pool_auto_provision_projects" {
     error_message = "The ado_pool_auto_provision_projects variable must be True or False."
   }
 }
+
+variable "http_connect_timeout" {
+  type        = number
+  description = "The maximum time in seconds before timing out a connection to the Azure DevOps REST API"
+  default     = 20
+}
+
+variable "http_max_time" {
+  type        = number
+  description = "The maximum amount of time in seconds for an Azure DevOps REST API operation to complete"
+  default     = 120
+}
+
+variable "http_retries" {
+  type        = number
+  description = "The number of retries make to the Azure DevOps REST API"
+  default     = 10
+}
+
+variable "http_retries_max_time" {
+  type        = number
+  description = "The maximum time in seconds for the retry period for a connection to the Azure DevOps REST API"
+  default     = 120
+}
+
+variable "http_retry_delay" {
+  type        = number
+  description = "The maximum time in seconds to delay before retrying a connection to the Azure DevOps REST API"
+  default     = 3
+}

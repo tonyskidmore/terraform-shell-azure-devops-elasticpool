@@ -26,5 +26,10 @@ resource "shell_script" "ado_vmss_pool" {
     ADO_PROJECT_ONLY              = var.ado_project_only
     ADO_SERVICE_CONNECTION        = var.ado_service_connection
     AZ_VMSS_ID                    = var.ado_vmss_id
+    HTTP_CONNECT_TIMEOUT          = var.http_connect_timeout
+    HTTP_MAX_TIME                 = var.http_max_time
+    HTTP_RETRIES                  = var.http_retries
+    HTTP_RETRIES_MAX_TIME         = var.http_retries_max_time
+    HTTP_RETRY_DELAY              = var.http_retry_delay
   }
 }
