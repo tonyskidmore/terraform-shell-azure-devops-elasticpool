@@ -272,7 +272,7 @@ build_params() {
           "--show-error" \
           "--retry" "$HTTP_RETRIES" \
           "--retry-delay" "$HTTP_RETRY_DELAY" \
-          "--retry-max-time" "$HTTP_RETRIES_MAX_TIME"
+          "--retry-max-time" "$HTTP_RETRIES_MAX_TIME" \
           "--max-time" "$HTTP_MAX_TIME" \
           "--connect-timeout" "$HTTP_CONNECT_TIMEOUT" \
           "--write-out" "\n%{http_code}" \
