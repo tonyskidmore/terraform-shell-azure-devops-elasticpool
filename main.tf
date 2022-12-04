@@ -1,6 +1,6 @@
 resource "shell_script" "ado_vmss_pool" {
   # https://github.com/scottwinkler/terraform-provider-shell/issues/79
-  dirty = false
+  dirty = var.ado_dirty
 
   lifecycle_commands {
     create = "bash ${path.module}/scripts/ado_elastic_pool.sh create"
