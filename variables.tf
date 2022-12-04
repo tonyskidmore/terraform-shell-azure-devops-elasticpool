@@ -75,6 +75,12 @@ variable "ado_pool_name" {
   default     = "azdo-vmss-pool-001"
 }
 
+variable "ado_dirty" {
+  type        = bool
+  description = "Azure DevOps pool settings are dirty"
+  default     = false
+}
+
 variable "ado_pool_recycle_after_use" {
   type        = bool
   description = "Discard machines after each job completes"
