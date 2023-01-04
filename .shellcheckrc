@@ -1,0 +1,2 @@
+# https://github.com/koalaman/shellcheck/wiki/Ignore#ignoring-one-or-more-types-of-errors-forever
+disable=SC2317 # Disable individual error codes
