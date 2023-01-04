@@ -2,6 +2,9 @@
 
 [keepachangelog](https://keepachangelog.com/en/1.0.0/)
 
+## [0.4.3]
+* Checkov updates
+
 ## [0.4.2]
 * Setting dirty as a variable
 
