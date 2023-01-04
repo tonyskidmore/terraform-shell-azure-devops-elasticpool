@@ -15,9 +15,9 @@ repos:
   - repo: https://github.com/bridgecrewio/checkov.git
     rev: '2.2.230'
     hooks:
-    - id: checkov
-      verbose: false
-      args: []
+      - id: checkov
+        verbose: false
+        args: [ ]
 
   - repo: https://github.com/antonbabenko/pre-commit-terraform
     # Get the latest from:
@@ -33,20 +33,20 @@ repos:
       - id: terraform-docs-go
         args: ["markdown", "table", "--output-file", "README.md", "./"]
 
-  -   repo: https://github.com/koalaman/shellcheck-precommit
-      rev: v0.8.0
-      hooks:
-        - id: shellcheck
+  - repo: https://github.com/koalaman/shellcheck-precommit
+    rev: v0.8.0
+    hooks:
+      - id: shellcheck
 
-  -   repo: local
-      hooks:
-        - id: unit-test
-          name: Unit tests
-          entry: test/bats/bin/bats
-          args:
-            ["-t", "test/"]
-          language: system
-          pass_filenames: false
+  - repo: local
+    hooks:
+      - id: unit-test
+        name: Unit tests
+        entry: test/bats/bin/bats
+        args:
+          ["-t", "test/"]
+        language: system
+        pass_filenames: false
 
   - repo: local
     hooks:
@@ -56,12 +56,12 @@ repos:
         language: system
         types: [python]
 
-  -   repo: https://github.com/PyCQA/flake8
-      rev: 4.0.1
-      hooks:
+  - repo: https://github.com/PyCQA/flake8
+    rev: 4.0.1
+    hooks:
       - id: flake8
 
-  -   repo: https://github.com/PyCQA/isort
-      rev: 5.10.1
-      hooks:
-      -   id: isort
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.10.1
+    hooks:
+      - id: isort
