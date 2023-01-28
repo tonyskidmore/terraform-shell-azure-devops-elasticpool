@@ -2,6 +2,9 @@
 
 [keepachangelog](https://keepachangelog.com/en/1.0.0/)
 
+## [0.4.4]
+* minor documentation updates
+
 ## [0.4.3]
 * Checkov updates
 
