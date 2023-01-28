@@ -30,7 +30,7 @@ Requirements
 
 | Name | Source | Version |
 |------|--------|---------|
-| azure-devops-elasticpool | tonyskidmore/azure-devops-elasticpool/shell | 0.4.3 |
+| azure-devops-elasticpool | tonyskidmore/azure-devops-elasticpool/shell | 0.4.4 |
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -69,7 +69,7 @@ data "azurerm_virtual_machine_scale_set" "ado_pool" {
 
 module "azure-devops-elasticpool" {
   source                 = "tonyskidmore/azure-devops-elasticpool/shell"
-  version                = "0.4.3"
+  version                = "0.4.4"
   ado_org                = var.ado_org
   ado_project            = var.ado_project
   ado_service_connection = var.ado_service_connection

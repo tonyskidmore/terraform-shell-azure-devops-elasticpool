@@ -8,6 +8,9 @@ Due to the fact that creating an [Agent Pool - Azure virtual machine scale set][
 due to not being supported by the SDK used by the [Azure DevOps Terraform Provider][terraform-provider-azuredevops],
 this module uses the [Terraform shell provider][shell-provider] as a workaround.
 
+This module is used by the [terraform-azurerm-vmss-devops-agent](https://registry.terraform.io/modules/tonyskidmore/vmss-devops-agent/azurerm/latest)
+to create the Azure DevOps Scale Set elasticpool side of a self-hosted Azure DevOps Scale Set agent pool.
+
 ## Requirements
 
 * An Azure subscription.
@@ -67,7 +70,7 @@ data "azurerm_virtual_machine_scale_set" "ado_pool" {
 
 module "azure-devops-elasticpool" {
   source                 = "tonyskidmore/azure-devops-elasticpool/shell"
-  version                = "0.4.3"
+  version                = "0.4.4"
   ado_org                = var.ado_org
   ado_project            = var.ado_project
   ado_service_connection = var.ado_service_connection
