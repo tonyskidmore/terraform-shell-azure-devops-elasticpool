@@ -2,6 +2,9 @@
 
 [keepachangelog](https://keepachangelog.com/en/1.0.0/)
 
+## [0.5.0]
+* Archived the shell-based module in favor of the provider-native replacement
+
 ## [0.4.4]
 * minor documentation updates
 
